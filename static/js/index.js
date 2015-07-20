@@ -33,7 +33,7 @@ $('#btn-connect').on('click', function(){
   socket.onerror = function(){
     isopen = false;
     socket = null;
-    $btn.button('error');btn-danger
+    $btn.button('error');
     $btn.removeClass("btn-primary btn-success").addClass("btn-danger");
   }
   
