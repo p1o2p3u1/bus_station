@@ -1,9 +1,9 @@
-.run{
-  background: #ddffdd !important;
+.syntaxhighlighter .line.run{
+  background-color: #ddffdd !important;
   border-left: 2px solid #00ff00 !important;
 }
 
-.mis{
-  background: #ffdddd !important;
+.syntaxhighlighter .line.mis{
+  background-color: #ffdddd !important;
   border-left: 2px solid #ff0000 !important;
 }

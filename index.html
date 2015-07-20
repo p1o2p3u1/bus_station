@@ -25,10 +25,10 @@
         <div id="navbar" class="navbar-collapse collapse">
           
           <div class="navbar-form navbar-left">
-            <input type="text" class="form-control" placeholder="测试服务器ip" id="txt-server-ip">
+            <input type="text" class="form-control" placeholder="测试服务器ip" id="txt-server-ip" value="localhost">
           </div>
           <div class="navbar-form navbar-left">
-            <input type="text" class="form-control" placeholder="websocket端口号" id="txt-server-port">
+            <input type="text" class="form-control" placeholder="websocket端口号" id="txt-server-port" value="9000">
           </div>
           <div class="navbar-form navbar-left">
             <button class="btn btn-primary" id="btn-connect" data-loading-text="连接中" data-complete-text="断开连接" data-error-text="连接失败">连接</button>
@@ -37,7 +37,14 @@
       </div>
     </nav>
     <div class="container-fluid">
-      <button class="btn btn-primary" id="btn-send">点我增加点覆盖率</button>
+      <div class="form-inline">
+        <div class="form-group">
+          <button class="btn btn-primary" id="btn-send">点我增加点覆盖率</button>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control">
+        </div>
+      </div>
       <div class="row">
         <pre class="brush:python;">
 from autobahn.twisted.websocket import WebSocketServerProtocol, \
@@ -70,7 +77,6 @@ class BusStation(WebSocketServerProtocol):
         for i in range(100):
             sum += i
         print sum
-        self.sendMessage(bytes(sum), False)
 
     def onClose(self, wasClean, code, reason):
         print("WebSocket connection closed: {0}".format(reason))
@@ -86,7 +92,6 @@ class BusStation(WebSocketServerProtocol):
         # Unicode character set.
         s = json.dumps(self.cov_data, ensure_ascii=False).encode('utf8')
         self.sendMessage(s, False)
-        print("send complete")
 
 class BusStationFactory(WebSocketServerFactory):
 
@@ -110,6 +115,7 @@ class CollectorService:
         self.thread = Thread(target=self.reactor.run, args=(False,))
 
     def start(self):
+        
         self.thread.start()
         print("socket service started on %s:%d" % (self.server, self.port))
 

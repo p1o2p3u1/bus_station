@@ -46,21 +46,29 @@ $('#btn-connect').on('click', function(){
   
   socket.onmessage = function(e){
     if(typeof e.data == "string"){
+      console.log(e.data);
       var obj = JSON.parse(e.data);
       var cov = obj['E:\\projects\\gitlab\\biubiu\\regularbus\\client.py'];
+      var exec = cov['executed'];
+      var missing = cov['missed'];
+      $.each(exec, function(i){
+        $('.number' + exec[i]).removeClass('mis').addClass('run');
+      });
+      $.each(missing, function(i){
+        $('.number' + missing[i]).removeClass('run').addClass('mis');
+      });
     }
-      
   }
 });
+SyntaxHighlighter.defaults['toolbar'] = false;
+SyntaxHighlighter.defaults['quick-code'] = false;
+SyntaxHighlighter.all();
 
 $("#btn-send").on('click', function(){
   if(isopen && socket != null){
     socket.send("hello world");
   }
 });
-var executed = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
-$.each(executed, function(i){
-  $('.number' + executed[i]).addClass('run');
-});
 
-SyntaxHighlighter.all();
+
+
