@@ -59,15 +59,32 @@ $('#btn-connect').on('click', function(){
       });
     }
   }
+  
+  // list directories
+  $.ajax({
+    url: "http://" + server_ip + ":5000/list",
+    jsonp: 'asd',
+    dataType: "jsonp",
+    success: function(response){
+      console.log(response);
+    }
+  });
+  
 });
 SyntaxHighlighter.defaults['toolbar'] = false;
 SyntaxHighlighter.defaults['quick-code'] = false;
 SyntaxHighlighter.all();
-
-$("#btn-send").on('click', function(){
-  if(isopen && socket != null){
-    socket.send("hello world");
-  }
+$('.tree').treegrid();
+$("#test").on('click', function(){
+  // list directories
+  $.ajax({
+    url: "http://localhost:5000/list",
+    jsonp: 'callback',
+    dataType: "jsonp",
+    success: function(response){
+      console.log(response);
+    }
+  });
 });
 
 
