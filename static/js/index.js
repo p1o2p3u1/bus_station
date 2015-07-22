@@ -1,5 +1,6 @@
 var socket = null;
 var isopen = false;
+var path = "";
 $('#btn-connect').on('click', function(){
   var $btn = $(this).button('loading');
   // check if the socket is already connected.
@@ -45,47 +46,134 @@ $('#btn-connect').on('click', function(){
   }
   
   socket.onmessage = function(e){
-    if(typeof e.data == "string"){
-      console.log(e.data);
-      var obj = JSON.parse(e.data);
-      var cov = obj['E:\\projects\\gitlab\\biubiu\\regularbus\\client.py'];
-      var exec = cov['executed'];
-      var missing = cov['missed'];
-      $.each(exec, function(i){
-        $('.number' + exec[i]).removeClass('mis').addClass('run');
-      });
-      $.each(missing, function(i){
-        $('.number' + missing[i]).removeClass('run').addClass('mis');
-      });
+    var selected_file = $('#source').attr('value');
+    var obj = JSON.parse(e.data);
+    console.log(obj);
+    show_coverage(obj);
+    if(selected_file && selected_file != ""){
+      var full_file_path = path + selected_file;
+      var cov = obj[full_file_path];
+      if(cov){
+        var exec = cov['executed'];
+        var missing = cov['missed'];
+        $.each(exec, function(i){
+          $('.number' + exec[i]).removeClass('mis').addClass('run');
+        });
+        $.each(missing, function(i){
+          $('.number' + missing[i]).removeClass('run').addClass('mis');
+        });
+      }
     }
   }
   
   // list directories
   $.ajax({
-    url: "http://" + server_ip + ":5000/list",
-    jsonp: 'asd',
+    url: "http://localhost:5000/list",
+    jsonp: 'callback',
     dataType: "jsonp",
-    success: function(response){
-      console.log(response);
-    }
+    jsonpCallback: "process_list_dir"
   });
   
 });
 SyntaxHighlighter.defaults['toolbar'] = false;
 SyntaxHighlighter.defaults['quick-code'] = false;
 SyntaxHighlighter.all();
-$('.tree').treegrid();
-$("#test").on('click', function(){
-  // list directories
-  $.ajax({
-    url: "http://localhost:5000/list",
-    jsonp: 'callback',
-    dataType: "jsonp",
-    success: function(response){
-      console.log(response);
+
+
+function build_file_tree(parent, childs){
+  var html = "";
+  if(parent != null){
+    html += '<tr class="treegrid-' + parent +'">';
+    html += '<td>' + parent + '</td>';
+    html += '<td class="coverage-' + parent + '">0%</td></tr>';
+  }
+    for(var i=0; i<childs.length; i++){
+      var class_value = "treegrid-" + childs[i];
+      if(parent){
+        class_value += " treegrid-parent-" + parent;
+      }
+      html += '<tr class="' + class_value +'">'
+      html += '<td><span class="file_source" value="' + childs[i] + '">' + childs[i] + '</span></td>';
+      if(parent){
+        html += '<td class="parent-' + parent +' coverage_' + childs[i].replace(/[\.\\]/g, '_') + '" value="0">0%</td></tr>';
+      } else {
+        html += '<td class="coverage_' + childs[i].replace(/[\.\\]/g, '_') + '" value="0">0%</td></tr>';
+      }
+      
     }
+  return html;
+}
+
+function process_list_dir(response){
+  path = response['path'];
+  if(path && path.indexOf('/') > -1){
+    path = path.replace(/\//g, '\\');
+  }
+  var dirs = response['dirs'];
+  var html = "";
+  for(var i = 0; i<dirs.length; i++){
+    var files = response[dirs[i]];
+    html += build_file_tree(dirs[i], files);
+  }
+  var files = response['files'];
+  html += build_file_tree(null, files);
+  $('.tree').html(html);
+  $('.tree').treegrid().treegrid('collapseAll');
+  $('.file_source').on('click', function(){
+    var path = $(this).attr('value');
+    path = encodeURI(path);
+    $.ajax({
+      url: 'http://localhost:5000/file/' + path,
+      jsonp: 'callback',
+      dataType: 'jsonp',
+      jsonpCallback: 'process_file_source'
+    });
   });
+}
+
+function process_file_source(response){
+  var filename = response['filename'];
+  var source = response['text'];
+  $('#source').attr('value', filename);
+  $('#source').html('<pre class="brush:python;">' + source + '</pre>');
+  SyntaxHighlighter.highlight();
+}
+
+function show_coverage(data){
+  if(data){
+    $.each(data, function(key, value){
+      var file = key.replace(path, '').replace(/[\.\\]/g, '_');
+      var cov = (value.coverage * 100).toFixed(2);
+      $('.coverage_' + file).attr('value', cov);
+      $('.coverage_' + file).text(cov + "%");
+      var rootNodes = $('.tree').treegrid('getRootNodes');
+      $.each(rootNodes, function(i){
+        var className = rootNodes[i].classList[0];
+        var parent_id = $('.' + className).treegrid('getNodeId');
+        var childs = $('.parent-' + parent_id);
+        var total_cov_parent = 0;
+        $.each(childs, function(){
+          total_cov_parent += parseFloat($(this).attr('value'));
+        });
+        var avg_cov_parent = 0;
+        if(childs.length > 0){
+          var avg_cov_parent = (total_cov_parent / childs.length).toFixed(2);
+        }
+        if(!avg_cov_parent) avg_cov_parent = 0;
+        $('.coverage-' + parent_id).attr('value', avg_cov_parent);
+        $('.coverage-' + parent_id).text(avg_cov_parent + "%");
+      });
+    });
+  }
+}
+
+$('#test').on('click', function(){
+  if(isopen && socket != null){
+    socket.send("hello world");
+  }
 });
+
+
 
 
 
