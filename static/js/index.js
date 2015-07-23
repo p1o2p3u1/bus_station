@@ -1,6 +1,7 @@
 var socket = null;
 var isopen = false;
 var path = "";
+var file_tree_init = false;
 $('#btn-connect').on('click', function(){
   var $btn = $(this).button('loading');
   // check if the socket is already connected.
@@ -45,10 +46,17 @@ $('#btn-connect').on('click', function(){
     $btn.removeClass('btn-success btn-danger').addClass("btn-primary");
   }
   
+    // list directories
+  $.ajax({
+    url: "http://localhost:5000/list",
+    jsonp: 'callback',
+    dataType: "jsonp",
+    jsonpCallback: "process_list_dir"
+  });
+  
   socket.onmessage = function(e){
     var selected_file = $('#source').attr('value');
     var obj = JSON.parse(e.data);
-    console.log(obj);
     show_coverage(obj);
     if(selected_file && selected_file != ""){
       var full_file_path = path + selected_file;
@@ -65,14 +73,6 @@ $('#btn-connect').on('click', function(){
       }
     }
   }
-  
-  // list directories
-  $.ajax({
-    url: "http://localhost:5000/list",
-    jsonp: 'callback',
-    dataType: "jsonp",
-    jsonpCallback: "process_list_dir"
-  });
   
 });
 SyntaxHighlighter.defaults['toolbar'] = false;
@@ -95,20 +95,17 @@ function build_file_tree(parent, childs){
       html += '<tr class="' + class_value +'">'
       html += '<td><span class="file_source" value="' + childs[i] + '">' + childs[i] + '</span></td>';
       if(parent){
-        html += '<td class="parent-' + parent +' coverage_' + childs[i].replace(/[\.\\]/g, '_') + '" value="0">0%</td></tr>';
+        html += '<td class="parent-' + parent +' coverage_' + childs[i].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
       } else {
-        html += '<td class="coverage_' + childs[i].replace(/[\.\\]/g, '_') + '" value="0">0%</td></tr>';
+        html += '<td class="coverage_' + childs[i].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
       }
-      
     }
   return html;
 }
 
 function process_list_dir(response){
   path = response['path'];
-  if(path && path.indexOf('/') > -1){
-    path = path.replace(/\//g, '\\');
-  }
+  path = path.toLowerCase();
   var dirs = response['dirs'];
   var html = "";
   for(var i = 0; i<dirs.length; i++){
@@ -119,11 +116,13 @@ function process_list_dir(response){
   html += build_file_tree(null, files);
   $('.tree').html(html);
   $('.tree').treegrid().treegrid('collapseAll');
+  file_tree_init = true;
   $('.file_source').on('click', function(){
-    var path = $(this).attr('value');
-    path = encodeURI(path);
+    var file_path = $(this).attr('value');
+    // I don't know why '/' can not be recognized.
+    file_path = encodeURI(file_path.replace(/\//g, '\\'));
     $.ajax({
-      url: 'http://localhost:5000/file/' + path,
+      url: 'http://localhost:5000/file/' + file_path,
       jsonp: 'callback',
       dataType: 'jsonp',
       jsonpCallback: 'process_file_source'
@@ -133,6 +132,7 @@ function process_list_dir(response){
 
 function process_file_source(response){
   var filename = response['filename'];
+  filename = filename.replace(/\\/g, '/');
   var source = response['text'];
   $('#source').attr('value', filename);
   $('#source').html('<pre class="brush:python;">' + source + '</pre>');
@@ -140,9 +140,10 @@ function process_file_source(response){
 }
 
 function show_coverage(data){
-  if(data){
+  if(data && file_tree_init){
     $.each(data, function(key, value){
-      var file = key.replace(path, '').replace(/[\.\\]/g, '_');
+      key = key.toLowerCase();
+      var file = key.replace(path, '').replace(/[\./]/g, '_');
       var cov = (value.coverage * 100).toFixed(2);
       $('.coverage_' + file).attr('value', cov);
       $('.coverage_' + file).text(cov + "%");
