@@ -105,7 +105,6 @@ function build_file_tree(parent, childs){
 
 function process_list_dir(response){
   path = response['path'];
-  path = path.toLowerCase();
   var dirs = response['dirs'];
   var html = "";
   for(var i = 0; i<dirs.length; i++){
@@ -120,9 +119,9 @@ function process_list_dir(response){
   $('.file_source').on('click', function(){
     var file_path = $(this).attr('value');
     // I don't know why '/' can not be recognized.
-    file_path = encodeURI(file_path.replace(/\//g, '\\'));
+    file_path = encodeURIComponent(file_path);
     $.ajax({
-      url: 'http://localhost:5000/file/' + file_path,
+      url: 'http://localhost:5000/file?path=' + file_path,
       jsonp: 'callback',
       dataType: 'jsonp',
       jsonpCallback: 'process_file_source'
@@ -142,7 +141,6 @@ function process_file_source(response){
 function show_coverage(data){
   if(data && file_tree_init){
     $.each(data, function(key, value){
-      key = key.toLowerCase();
       var file = key.replace(path, '').replace(/[\./]/g, '_');
       var cov = (value.coverage * 100).toFixed(2);
       $('.coverage_' + file).attr('value', cov);
