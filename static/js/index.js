@@ -166,12 +166,6 @@ function show_coverage(data){
   }
 }
 
-$('#test').on('click', function(){
-  if(isopen && socket != null){
-    socket.send("hello world");
-  }
-});
-
 
 
 
