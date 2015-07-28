@@ -66,12 +66,14 @@ $('#btn-connect').on('click', function(){
       if(cov){
         var exec = cov['executed'];
         var missing = cov['missed'];
+        var coverage = cov['coverage'];
         $.each(exec, function(i){
           $('.number' + exec[i]).removeClass('mis').addClass('run');
         });
         $.each(missing, function(i){
           $('.number' + missing[i]).removeClass('run').addClass('mis');
         });
+        display_progress_bar(selected_file);
       }
     }
   }
@@ -120,7 +122,7 @@ function process_list_dir(response){
   file_tree_init = true;
   $('.file_source').on('click', function(){
     var file_path = $(this).attr('value');
-    // I don't know why '/' can not be recognized.
+    display_progress_bar(file_path);
     file_path = encodeURIComponent(file_path);
     $.ajax({
       url: 'http://' + server_ip + ':5000/file?path=' + file_path,
@@ -128,6 +130,7 @@ function process_list_dir(response){
       dataType: 'jsonp',
       jsonpCallback: 'process_file_source'
     });
+    // display progress bar
   });
 }
 
@@ -173,6 +176,15 @@ $("#menu-toggle").click(function(e) {
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
 });
+
+function display_progress_bar(filename){
+  var filepath = filename.replace(/[\./]/g, '_');
+  var cov = $('.coverage_' + filepath).attr("value");
+  var html = '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + cov + '" ';
+  html += 'aria-valuemin="0" aria-valuemax="100" style="width:' + cov + '%">';
+  html += cov + '% Complete ' + filename + '</div>';
+  $('#source-progress').html(html);
+}
 
 
 
