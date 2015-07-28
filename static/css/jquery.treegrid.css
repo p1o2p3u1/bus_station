@@ -9,7 +9,6 @@ table.tree {
   font:14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color:#777;
   font-weight:300;
-  width:25%;
   border-collapse:collapse;
 }
 
@@ -32,4 +31,12 @@ th {
   color: #337ab7;
   text-decoration: underline;
   cursor: pointer;
+}
+
+table.tree td.file-path {
+  width: 90%;
+}
+
+table.tree td.file-cov {
+  width: 10%;
 }

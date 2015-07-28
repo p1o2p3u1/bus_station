@@ -2,6 +2,8 @@ var socket = null;
 var isopen = false;
 var path = "";
 var file_tree_init = false;
+var server_ip = "";
+var server_port = "";
 $('#btn-connect').on('click', function(){
   var $btn = $(this).button('loading');
   // check if the socket is already connected.
@@ -48,7 +50,7 @@ $('#btn-connect').on('click', function(){
   
     // list directories
   $.ajax({
-    url: "http://localhost:5000/list",
+    url: "http://" + server_ip + ":5000/list",
     jsonp: 'callback',
     dataType: "jsonp",
     jsonpCallback: "process_list_dir"
@@ -84,8 +86,8 @@ function build_file_tree(parent, childs){
   var html = "";
   if(parent != null){
     html += '<tr class="treegrid-' + parent +'">';
-    html += '<td>' + parent + '</td>';
-    html += '<td class="coverage-' + parent + '">0%</td></tr>';
+    html += '<td class="file-path">' + parent + '</td>';
+    html += '<td class="file-cov coverage-' + parent + '">0%</td></tr>';
   }
     for(var i=0; i<childs.length; i++){
       var class_value = "treegrid-" + childs[i];
@@ -93,11 +95,11 @@ function build_file_tree(parent, childs){
         class_value += " treegrid-parent-" + parent;
       }
       html += '<tr class="' + class_value +'">'
-      html += '<td><span class="file_source" value="' + childs[i] + '">' + childs[i] + '</span></td>';
+      html += '<td class="file-path"><span class="file_source" value="' + childs[i] + '">' + childs[i] + '</span></td>';
       if(parent){
-        html += '<td class="parent-' + parent +' coverage_' + childs[i].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
+        html += '<td class="file-cov parent-' + parent +' coverage_' + childs[i].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
       } else {
-        html += '<td class="coverage_' + childs[i].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
+        html += '<td class="file-cov coverage_' + childs[i].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
       }
     }
   return html;
@@ -121,7 +123,7 @@ function process_list_dir(response){
     // I don't know why '/' can not be recognized.
     file_path = encodeURIComponent(file_path);
     $.ajax({
-      url: 'http://localhost:5000/file?path=' + file_path,
+      url: 'http://' + server_ip + ':5000/file?path=' + file_path,
       jsonp: 'callback',
       dataType: 'jsonp',
       jsonpCallback: 'process_file_source'
@@ -166,6 +168,11 @@ function show_coverage(data){
   }
 }
 
+
+$("#menu-toggle").click(function(e) {
+  e.preventDefault();
+  $("#wrapper").toggleClass("toggled");
+});
 
 
 

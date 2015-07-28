@@ -7,3 +7,84 @@
   background-color: #ffdddd !important;
   border-left: 2px solid #ff0000 !important;
 }
+
+.syntaxhighlighter {
+    width: 500px;
+    height: 900px;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+}
+
+.sidebar {
+  width: 400px;
+  height: 900px;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.sidebar-toggle-box {
+    float: left;
+    padding-right: 15px;
+    margin-top: 20px;
+}
+
+.sidebar-toggle-box .icon-reorder {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 20px;
+}
+
+a.logo {
+    font-size: 21px;
+    color: #2e2e2e;
+    float: left;
+    margin-top: 15px;
+    text-transform: uppercase;
+}
+
+a.logo:hover, a.logo:focus {
+    text-decoration: none;
+    outline: none;
+}
+
+
+#wrapper {
+    padding-left: 0;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    padding-left: 400px;
+}
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: absolute;
+    left: 400px;
+    width: 0;
+    height: 900px;
+    margin-left: -400px;
+    overflow-y: auto;
+    overflow-x: auto;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width: 400px;
+}
+
+#page-content-wrapper {
+    position: absolute;
+    padding: 15px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    position: absolute;
+}
+
