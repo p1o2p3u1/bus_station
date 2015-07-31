@@ -25,8 +25,11 @@ $('#btn-connect').on('click', function(){
     alert("server ip or port should not be empty");
     return;
   }
-  // init the web socket
+  // init the web socket, however we can not try-cache the connection error
+  // I've googled for a while but doesn't find a solution, damn it!
+  
   socket = new WebSocket("ws://" + server_ip + ":" + server_port);
+  
   socket.binaryType = "arraybuffer";
   socket.onopen = function(){
     isopen = true;
@@ -50,7 +53,7 @@ $('#btn-connect').on('click', function(){
   
     // list directories
   $.ajax({
-    url: "http://" + server_ip + ":5000/list",
+    url: "http://" + server_ip + ":8777/list",
     jsonp: 'callback',
     dataType: "jsonp",
     jsonpCallback: "process_list_dir"
@@ -125,12 +128,11 @@ function process_list_dir(response){
     display_progress_bar(file_path);
     file_path = encodeURIComponent(file_path);
     $.ajax({
-      url: 'http://' + server_ip + ':5000/file?path=' + file_path,
+      url: 'http://' + server_ip + ':8777/file?path=' + file_path,
       jsonp: 'callback',
       dataType: 'jsonp',
       jsonpCallback: 'process_file_source'
     });
-    // display progress bar
   });
 }
 
@@ -171,7 +173,6 @@ function show_coverage(data){
   }
 }
 
-
 $("#menu-toggle").click(function(e) {
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
@@ -186,6 +187,4 @@ function display_progress_bar(filename){
   $('#source-progress').html(html);
 }
 
-
-
-
+$('[data-toggle="tooltip"]').tooltip()
