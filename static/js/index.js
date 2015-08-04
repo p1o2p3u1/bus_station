@@ -4,6 +4,7 @@ var path = "";
 var file_tree_init = false;
 var server_ip = "";
 var server_port = "";
+var btn_state = "stop"
 $('#btn-connect').on('click', function(){
   var $btn = $(this).button('loading');
   // check if the socket is already connected.
@@ -31,20 +32,26 @@ $('#btn-connect').on('click', function(){
   socket = new WebSocket("ws://" + server_ip + ":" + server_port);
   
   socket.binaryType = "arraybuffer";
-  socket.onopen = function(){
+  socket.onopen = function(event){
+    console.log("websocket connected");
+    console.log(event);
     isopen = true;
     $btn.button('complete');
     $btn.removeClass("btn-primary btn-danger").addClass("btn-success");
   }
   
-  socket.onerror = function(){
+  socket.onerror = function(event){
+    console.log("there is error");
+    console.log(event);
     isopen = false;
     socket = null;
     $btn.button('error');
     $btn.removeClass("btn-primary btn-success").addClass("btn-danger");
   }
   
-  socket.onclose = function(){
+  socket.onclose = function(event){
+    console.log("websocket closed");
+    console.log(event);
     isopen = false;
     socket = null;
     $btn.button('reset');
@@ -53,7 +60,7 @@ $('#btn-connect').on('click', function(){
   
     // list directories
   $.ajax({
-    url: "http://" + server_ip + ":8777/list",
+    url: "http://" + server_ip + ":5000/list",
     jsonp: 'callback',
     dataType: "jsonp",
     jsonpCallback: "process_list_dir"
@@ -88,26 +95,33 @@ SyntaxHighlighter.all();
 
 
 function build_file_tree(parent, childs){
+  var total_code_lines = 0;
   var html = "";
-  if(parent != null){
-    html += '<tr class="treegrid-' + parent +'">';
-    html += '<td class="file-path">' + parent + '</td>';
-    html += '<td class="file-cov coverage-' + parent + '">0%</td></tr>';
-  }
-    for(var i=0; i<childs.length; i++){
-      var class_value = "treegrid-" + childs[i];
-      if(parent){
-        class_value += " treegrid-parent-" + parent;
-      }
-      html += '<tr class="' + class_value +'">'
-      html += '<td class="file-path"><span class="file_source" value="' + childs[i] + '">' + childs[i] + '</span></td>';
-      if(parent){
-        html += '<td class="file-cov parent-' + parent +' coverage_' + childs[i].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
-      } else {
-        html += '<td class="file-cov coverage_' + childs[i].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
-      }
+  for(var i=0; i<childs.length; i++){
+    var class_value = "treegrid-" + childs[i][0];
+    total_code_lines += childs[i][1];
+    if(parent){
+      class_value += " treegrid-parent-" + parent;
     }
-  return html;
+    html += '<tr class="' + class_value +'">'
+    html += '<td class="file-path"><span class="file_source" value="' + childs[i][0] + '">' + childs[i][0] + '</span></td>';
+    html += '<td class="code-lines">' + childs[i][1] + '</td>'
+    html += '<td class="run-lines">0</td>'
+    if(parent){
+      html += '<td class="file-cov parent-' + parent +' coverage_' + childs[i][0].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
+    } else {
+      html += '<td class="file-cov coverage_' + childs[i][0].replace(/[\./]/g, '_') + '" value="0">0%</td></tr>';
+    }
+  }
+  var parent_html = "";
+  if(parent != null){
+    parent_html += '<tr class="treegrid-' + parent +'">';
+    parent_html += '<td class="file-path">' + parent + '</td>';
+    parent_html += '<td class="total-code-lines">' + total_code_lines + '</td>';
+    parent_html += '<td class="total-run-lines">0</td>';
+    parent_html += '<td class="file-cov">0%</td></tr>';
+  }
+  return parent_html + html;
 }
 
 function process_list_dir(response){
@@ -128,7 +142,7 @@ function process_list_dir(response){
     display_progress_bar(file_path);
     file_path = encodeURIComponent(file_path);
     $.ajax({
-      url: 'http://' + server_ip + ':8777/file?path=' + file_path,
+      url: 'http://' + server_ip + ':5000/file?path=' + file_path,
       jsonp: 'callback',
       dataType: 'jsonp',
       jsonpCallback: 'process_file_source'
@@ -147,28 +161,31 @@ function process_file_source(response){
 
 function show_coverage(data){
   if(data && file_tree_init){
+    // display coverage data for each file
     $.each(data, function(key, value){
       var file = key.replace(path, '').replace(/[\./]/g, '_');
       var cov = (value.coverage * 100).toFixed(2);
-      $('.coverage_' + file).attr('value', cov);
-      $('.coverage_' + file).text(cov + "%");
-      var rootNodes = $('.tree').treegrid('getRootNodes');
-      $.each(rootNodes, function(i){
-        var className = rootNodes[i].classList[0];
-        var parent_id = $('.' + className).treegrid('getNodeId');
-        var childs = $('.parent-' + parent_id);
-        var total_cov_parent = 0;
-        $.each(childs, function(){
-          total_cov_parent += parseFloat($(this).attr('value'));
-        });
-        var avg_cov_parent = 0;
-        if(childs.length > 0){
-          var avg_cov_parent = (total_cov_parent / childs.length).toFixed(2);
-        }
-        if(!avg_cov_parent) avg_cov_parent = 0;
-        $('.coverage-' + parent_id).attr('value', avg_cov_parent);
-        $('.coverage-' + parent_id).text(avg_cov_parent + "%");
+      var run_lines = value.executed.length
+      $('.coverage_' + file).attr('value', cov).text(cov + "%");
+      $('.coverage_' + file).parent().children('td[class="run-lines"]').attr('value', run_lines).text(run_lines);
+    });
+    // display coverage data for each folder
+    var rootNodes = $('.tree').treegrid('getRootNodes');
+    $.each(rootNodes, function(i){
+      var className = rootNodes[i].classList[0];
+      var parent_id = $('.' + className).treegrid('getNodeId');
+      var childs = $('.treegrid-parent-' + parent_id);
+      var total_run_lines = 0;
+      $.each(childs, function(){
+        total_run_lines += parseInt($(this).children('td[class="run-lines"]').text());
       });
+      $('.treegrid-' + parent_id).children('td[class="total-run-lines"]').text(total_run_lines);
+      var total_code_lines = parseInt($('.treegrid-' + parent_id).children('td[class="total-code-lines"]').text());
+      var avg_cov_parent = 0;
+      if(childs.length > 0 && total_code_lines > 0){
+        avg_cov_parent = (total_run_lines * 100.0 / total_code_lines).toFixed(2);
+      }
+      $('.treegrid-' + parent_id).children('td[class="file-cov"]').text(avg_cov_parent + "%");
     });
   }
 }
@@ -187,4 +204,70 @@ function display_progress_bar(filename){
   $('#source-progress').html(html);
 }
 
-$('[data-toggle="tooltip"]').tooltip()
+$('[data-toggle="tooltip"]').tooltip();
+
+$('#button_play').on('click', function(){
+  if(btn_state == "stop"){
+    btn_state = "play";
+    $('#button_play > i').attr('class', 'icon-pause');
+    $('#button_play').attr('class', 'btn btn-success');
+    sendMessage(JSON.stringify({
+      "op": "start"
+    }));
+  } else if(btn_state == "play" || btn_state == "resume"){
+    btn_state = "pause";
+    $('#button_play > i').attr('class', 'icon-play');
+    sendMessage(JSON.stringify({
+      "op": "pause"
+    }));
+  } else if(btn_state == "pause"){
+    btn_state = "resume";
+    $('#button_play > i').attr('class', 'icon-pause');
+    sendMessage(JSON.stringify({
+      "op": "resume"
+    }));
+  }
+});
+
+$('#button_stop').on('click', function(){
+  btn_state = "stop";
+  $('#button_play').attr('class', 'btn btn-default');
+  $('#button_play > i').attr('class', 'icon-play');
+  sendMessage(JSON.stringify({
+    "op": "stop"
+  }));
+});
+
+
+function sendMessage(message){
+  if(isopen && socket != null){
+    socket.send(message);
+  }
+}
+
+$('#test').on('click', function(){
+  var ms = JSON.stringify({
+    "op": "add",
+    "files": ["/User/Ting/a.py"]
+  });
+  sendMessage(ms);
+});
+
+$('#start_trace').on('click', function(){
+  sendMessage(JSON.stringify({
+    "op": "start_trace"
+  }));
+});
+
+$('#clear_trace').on('click', function(){
+  sendMessage(JSON.stringify({
+    "op": "clear"
+  }));
+});
+
+$('#stop_trace').on('click', function(){
+  sendMessage(JSON.stringify({
+    "op": "stop_trace"
+  }));
+});
+
