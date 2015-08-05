@@ -60,7 +60,7 @@ a.logo:hover, a.logo:focus {
 }
 
 #wrapper.toggled {
-    padding-left: 500px;
+    padding-left: 550px;
 }
 
 #sidebar-wrapper {
@@ -83,7 +83,6 @@ a.logo:hover, a.logo:focus {
 }
 
 #page-content-wrapper {
-    margin-left: 20px;
     padding: 15px;
 }
 

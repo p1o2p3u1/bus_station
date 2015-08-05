@@ -4,7 +4,7 @@ var path = "";
 var file_tree_init = false;
 var server_ip = "";
 var server_port = "";
-var btn_state = "stop"
+var btn_state = "stop";
 $('#btn-connect').on('click', function(){
   var $btn = $(this).button('loading');
   // check if the socket is already connected.
