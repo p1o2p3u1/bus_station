@@ -83,7 +83,6 @@ $('#btn-connect').on('click', function(){
         $.each(missing, function(i){
           $('.number' + missing[i]).removeClass('run').addClass('mis');
         });
-        display_progress_bar(selected_file);
       }
     }
   }
@@ -139,7 +138,6 @@ function process_list_dir(response){
   file_tree_init = true;
   $('.file_source').on('click', function(){
     var file_path = $(this).attr('value');
-    display_progress_bar(file_path);
     file_path = encodeURIComponent(file_path);
     $.ajax({
       url: 'http://' + server_ip + ':5000/file?path=' + file_path,
@@ -194,15 +192,6 @@ $("#menu-toggle").click(function(e) {
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
 });
-
-function display_progress_bar(filename){
-  var filepath = filename.replace(/[\./]/g, '_');
-  var cov = $('.coverage_' + filepath).attr("value");
-  var html = '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="' + cov + '" ';
-  html += 'aria-valuemin="0" aria-valuemax="100" style="width:' + cov + '%">';
-  html += cov + '% Complete ' + filename + '</div>';
-  $('#source-progress').html(html);
-}
 
 $('[data-toggle="tooltip"]').tooltip();
 
