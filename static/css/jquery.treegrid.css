@@ -12,18 +12,18 @@ table.tree {
   border-collapse:collapse;
 }
 
-th, td {
+table.tree th, td {
   text-align:left;
   padding:5px 10px;
   border-bottom:1px solid #e5e5e5;
 }
 
-dt {
+table.tree dt {
   color:#444;
   font-weight:700;
 }
 
-th {
+table.tree th {
   color:#444;
 }
 
