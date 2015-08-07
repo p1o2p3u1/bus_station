@@ -7,7 +7,6 @@ var server_port = "";
 var btn_state = "stop";
 var show_diff = false;
 var diff_list = [];
-var latest_cov_data = null;
 $('#btn-connect').on('click', function(){
   var $btn = $(this).button('loading');
   // check if the socket is already connected.
@@ -82,14 +81,21 @@ $('#btn-connect').on('click', function(){
           var exec1 = cov['executed'];
           var exec = $(exec1).filter(diff_list);
           var missing = $(diff_list).not(exec);
+          var file_cov = cov['coverage'];
           $.each(exec, function(i){
             $('.number' + exec[i]).removeClass('mis').addClass('run');
           });
           $.each(missing, function(i){
             $('.number' + missing[i]).removeClass('run').addClass('mis');
           });
-          $('#diff-cov').text((parseFloat(exec.length / diff_list.length) * 100).toFixed(2) + "%");
+          if(diff_list.length == 0){
+            $('#diff-cov').text('100%');
+          } else {
+            $('#diff-cov').text((parseFloat(exec.length / diff_list.length) * 100).toFixed(2) + "%");
+          }
+          $('#source-cov').text((parseFloat(file_cov) * 100).toFixed(2) + "%");
         } else {
+          // not show diff result
           var exec = cov['executed'];
           var missing = cov['missed'];
           var coverage = cov['coverage'];
@@ -106,14 +112,16 @@ $('#btn-connect').on('click', function(){
       }
     }
   }
-  
 });
+// disable toolbar and double click edit, we don't need it.
 SyntaxHighlighter.defaults['toolbar'] = false;
 SyntaxHighlighter.defaults['quick-code'] = false;
 SyntaxHighlighter.all();
 
 // build the left sidebar 
 function build_file_tree(parent, childs){
+  // first build sub directories, calculate total lines and then build parent folder.
+  // childs are list of tuples [(filename1, lines_no), (filename2, lines_no)...]
   var total_code_lines = 0;
   var html = "";
   for(var i=0; i<childs.length; i++){
@@ -158,6 +166,7 @@ function process_list_dir(response){
   $('.tree').treegrid().treegrid('collapseAll');
   file_tree_init = true;
   $('.file_source').on('click', function(){
+    // add click event for each file, then get the source text for it
     var file_path = $(this).attr('value');
     file_path = encodeURIComponent(file_path);
     $.ajax({
@@ -296,8 +305,8 @@ $('#chk-show-diff').on('click', function(){
     filename = encodeURIComponent(filename);
     var cur_version = $("#source-revision").text();
     var old_version = $("#txt-diff-version").val();
-    if(old_version > cur_version){
-      alert("别闹了~");
+    if(!old_version || old_version > cur_version){
+      alert("diff版本要小于当前文件版本");
       return;
     }
     // get diff info

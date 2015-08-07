@@ -22,7 +22,7 @@
             <span class="icon-bar"></span>
           </button>
           <div class="sidebar-toggle-box">
-                <div data-toggle="tooltip" title="Toggle Navigation" data-placement="right" class="icon-reorder tooltips" id="menu-toggle"></div>
+            <div data-toggle="tooltip" title="Toggle Navigation" data-placement="right" class="icon-reorder tooltips" id="menu-toggle"></div>
           </div>
           <a class="logo" href="#">Dashboard</a>
         </div>
@@ -30,7 +30,7 @@
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-user"></i>
-            Ting
+            {{ name }}
             <i class="icon-caret-down"></i>
           </a>
           <ul class="dropdown-menu dropdown-user">
@@ -46,7 +46,7 @@
             </li>
             <li class="divider"></li>
               <li>
-                <a href="login.html">
+                <a href="logout">
                   <i class="icon-sign-out"> Logout</i>
                 </a>
               </li>
@@ -63,7 +63,7 @@
           <div class="navbar-form navbar-left">
             <button class="btn btn-primary" id="btn-connect" data-loading-text="连接中" data-complete-text="断开连接" data-error-text="连接失败">连接</button>
           </div>
-        </div>
+      </div>
     </nav>
     <div id="wrapper" class="toggled">
       <div id="sidebar-wrapper">
@@ -85,19 +85,35 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-lg-12">
-              <div class="source-info">
-                <label>文件名称：</label><span id="source-name"></span>
-                <label>文件版本号：</label><span id="source-revision"></span>
-                <label>覆盖率</label><span id="source-cov"></span>
-                <label>diff覆盖率</label><span id="diff-cov"></span>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Filename：</th>
+                      <th>Revision</th>
+                      <th>Coverage %</th>
+                      <th>diff Revision</th>
+                      <th>diff Coverage %</th>
+                      <th>diff coverage result only</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td id="source-name"></td>
+                      <td id="source-revision"></td>
+                      <td id="source-cov"></td>
+                      <td id="diff-revision">
+                        <input type="text" placeholder="diff版本号" id="txt-diff-version">
+                      </td>
+                      <td id="diff-cov"></td>
+                      <td>
+                        <input type="checkbox" id="chk-show-diff">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div class="form-inline">
-                <input type="text" class="form-control" placeholder="diff版本号" id="txt-diff-version">
-                <label>
-                  <input type="checkbox" id="chk-show-diff"> 只显示diff的覆盖结果
-                  <button class="btn btn-default" id="btn-show-diff">擦</button>
-                </label>
-              </div>
+              <button class="btn btn-primary">保存测试结果</button>
               <div id="source"></div>
             </div>
           </div>
