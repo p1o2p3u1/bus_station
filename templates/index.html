@@ -10,6 +10,7 @@
     <link href="static/syntaxhighlighter/styles/shCoreDefault.css" rel="stylesheet">
     <link href="static/css/jquery.treegrid.css" rel="stylesheet">
     <link href="http://hs.nie.netease.com/static/admin/assets/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="static/css/chosen.min.css" rel="stylesheet">
     <link href="static/css/index.css" rel="stylesheet">
 	</head>
   <body>
@@ -114,9 +115,30 @@
                 </table>
               </div>
               <button class="btn btn-primary">保存测试结果</button>
+              <button id="show-file-selector-modal" class="btn-danger btn pull-right">添加文件</a>
               <div id="source"></div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal fade" id="file-selector-modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form class="form-horizontal">
+            <div class="modal-header">
+              <h4>选择测试文件</h4>
+            </div> 
+            <div class="modal-body">
+              <select id="file-selector" data-placeholder="Choose Your Test Files..." class="chosen-select" multiple style="width: 100%">
+              </select>
+            </div>
+            <div class="modal-footer">
+              <a class="btn btn-default" data-dismiss="modal">添加</a>
+              <a class="btn btn-primary" data-dismiss="modal">关闭</a>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -125,6 +147,7 @@
     <script type="text/javascript" src="static/syntaxhighlighter/scripts/shCore.js"></script>
     <script type="text/javascript" src="static/syntaxhighlighter/scripts/shBrushPython.js"></script>
     <script type="text/javascript" src="static/js/jquery.treegrid.min.js"></script>
+    <script type="text/javascript" src="static/js/chosen.jquery.min.js"></script>
     <script type="text/javascript" src="static/js/index.js"></script>
   </body>
 </html>

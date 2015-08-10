@@ -321,3 +321,41 @@ $('#chk-show-diff').on('click', function(){
   }
 });
 
+$('#show-file-selector-modal').on('click', function(){
+  server_ip = $('#txt-server-ip').val();
+  $.ajax({
+    url: "http://" + server_ip + ":5000/list",
+    jsonp: 'callback',
+    dataType: "jsonp",
+    jsonpCallback: "process_list_dir2"
+  });
+});
+
+$('#file-selector-modal').on('shown.bs.modal', function () {
+  $('#file-selector').chosen();
+});
+
+function process_list_dir2(response){
+  path = response['path'];
+  var html = "";
+  var dirs = response['dirs'];
+  for(var i=0; i<dirs.length; i++){
+    var files = response[dirs[i]];
+    html += build_select_option(dirs[i], files);
+  }
+  var files = response['files'];
+  html += build_select_option("/", files);
+  $('#file-selector').html(html);
+  $('#file-selector-modal').modal('show');
+}
+
+function build_select_option(group, files){
+  var html = '<optgroup label=" ' + group + '">';
+  for(var i=0; i<files.length; i++){
+    html += '<option>' + files[i][0] + '</option>';
+  }
+  html += '</optgroup>';
+  return html
+}
+
+
