@@ -322,40 +322,89 @@ $('#chk-show-diff').on('click', function(){
 });
 
 $('#show-file-selector-modal').on('click', function(){
-  server_ip = $('#txt-server-ip').val();
-  $.ajax({
-    url: "http://" + server_ip + ":5000/list",
-    jsonp: 'callback',
-    dataType: "jsonp",
-    jsonpCallback: "process_list_dir2"
-  });
-});
-
-$('#file-selector-modal').on('shown.bs.modal', function () {
-  $('#file-selector').chosen();
-});
-
-function process_list_dir2(response){
-  path = response['path'];
-  var html = "";
-  var dirs = response['dirs'];
-  for(var i=0; i<dirs.length; i++){
-    var files = response[dirs[i]];
-    html += build_select_option(dirs[i], files);
+  if(file_tree_init){
+    $('#file-selector-modal').modal('show');
+  } else {
+    server_ip = $('#txt-server-ip').val();
+    $.ajax({
+      url: "http://" + server_ip + ":5000/list",
+      jsonp: 'callback',
+      dataType: "jsonp",
+      success: function(response){
+        path = response['path'];
+        var dirs = response['dirs'];
+        var html = "";
+        for(var i=0; i<dirs.length; i++){
+          var files = response[dirs[i]];
+          html += build_modal_file_tree(dirs[i], files);
+        }
+        var files = response['files'];
+        html += build_modal_file_tree(null, files);
+        $('#file-selector').html(html);
+        $('#file-selector').treegrid().treegrid('collapseAll');
+        $('#file-selector-modal').modal('show');
+        $('.select-this').on('click', function(){
+          var is_checked = $(this).is(':checked');
+          var node = $(this).parent().parent();
+          if(node.treegrid('isNode') == false){
+            change_select_state(node, [node], is_checked, false);
+          } else {
+            if(node.treegrid('getParentNode') == null){
+              // this is already the parent node and it is is_checked, 
+              // so all the childs node should also be is_checked.
+              var childs = node.treegrid('getChildNodes');
+              change_select_state(node, childs, is_checked, true);
+            } else {
+              var parent = node.treegrid('getParentNode');
+              change_select_state(parent, [node], is_checked, false);
+            }
+          }
+        });
+      }
+    });
+    file_tree_init = true;
   }
-  var files = response['files'];
-  html += build_select_option("/", files);
-  $('#file-selector').html(html);
-  $('#file-selector-modal').modal('show');
+});
+
+
+
+function change_select_state(parent, childs, state, change_all){
+  if(state == true){
+    for(var i=0; i<childs.length; i++){
+      $(childs[i]).css('background-color', '#ddffdd');
+      $(childs[i]).find('input').prop('checked', true);
+    }
+    if(change_all){
+      parent.css('background-color', '#ddffdd');
+      parent.find('input').prop('checked', true);
+    }
+  } else {
+    for(var i=0; i<childs.length; i++){
+      $(childs[i]).css('background-color', '');
+      $(childs[i]).find('input').prop('checked', false);
+    }
+    parent.css('background-color', '');
+    parent.find('input').prop('checked', false);
+  }
 }
 
-function build_select_option(group, files){
-  var html = '<optgroup label=" ' + group + '">';
-  for(var i=0; i<files.length; i++){
-    html += '<option>' + files[i][0] + '</option>';
+function build_modal_file_tree(parent, childs){
+  var html = "";
+  if(parent){
+    html += '<tr class="treegrid-' + parent +'">';
+    html += '<td class="file-path">' + parent + '</td>';
+    html += '<td class="is-select"><input type="checkbox" class="select-this"></td></tr>'
   }
-  html += '</optgroup>';
-  return html
+  for(var i=0; i<childs.length; i++){
+    var class_value = "treegrid-" + childs[i][0];
+    if(parent){
+      class_value += " treegrid-parent-" + parent;
+    }
+    html += '<tr class="' + class_value +'">'
+    html += '<td class="file-path">' + childs[i][0] + '</td>';
+    html += '<td class="is-select"><input type="checkbox" class="select-this"></td></tr>'
+  }
+  return html;
 }
 
 

@@ -1,11 +1,11 @@
 .syntaxhighlighter .line.run{
   background-color: #ddffdd !important;
-  border-left: 2px solid #00ff00 !important;
+  border-left: 2px solid #ddffdd !important;
 }
 
 .syntaxhighlighter .line.mis{
   background-color: #ffdddd !important;
-  border-left: 2px solid #ff0000 !important;
+  border-left: 2px solid #ffdddd !important;
 }
 
 .syntaxhighlighter {
@@ -128,4 +128,11 @@ a.logo:hover, a.logo:focus {
 .navbar-top-links .dropdown-user {
     right: 0;
     left: auto;
+}
+
+.modal-body {
+  width: 580px;
+  height: 600px;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
 }

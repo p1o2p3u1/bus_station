@@ -5,25 +5,26 @@
 .treegrid-expander-expanded{background-image: url(../img/collapse.png); }
 .treegrid-expander-collapsed{background-image: url(../img/expand.png);}
 
-table.tree {
+table.tree, #file-selector{
   font:14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color:#777;
   font-weight:300;
   border-collapse:collapse;
+  width: 100%;
 }
 
-table.tree th, td {
+table.tree th, td, #file-selector th, td {
   text-align:left;
   padding:5px 10px;
   border-bottom:1px solid #e5e5e5;
 }
 
-table.tree dt {
+table.tree dt, #file-selector dt{
   color:#444;
   font-weight:700;
 }
 
-table.tree th {
+table.tree th, #file-selector th{
   color:#444;
 }
 
@@ -33,10 +34,10 @@ table.tree th {
   cursor: pointer;
 }
 
-table.tree td.file-path {
+table.tree td.file-path, #file-selector td.file-path{
   width: 90%;
 }
 
-table.tree td.file-cov {
+table.tree td.file-cov, #file-selector td.file-cov {
   width: 10%;
 }

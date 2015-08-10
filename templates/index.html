@@ -131,8 +131,13 @@
               <h4>选择测试文件</h4>
             </div> 
             <div class="modal-body">
-              <select id="file-selector" data-placeholder="Choose Your Test Files..." class="chosen-select" multiple style="width: 100%">
-              </select>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <input type="text" class="form-control" placeholder="Search" id="modal-file-search">
+                </div>
+              </div>
+              <table id="file-selector">
+              </table>
             </div>
             <div class="modal-footer">
               <a class="btn btn-default" data-dismiss="modal">添加</a>
