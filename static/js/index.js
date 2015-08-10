@@ -7,6 +7,8 @@ var server_port = "";
 var btn_state = "stop";
 var show_diff = false;
 var diff_list = [];
+var selected_files = {};
+var dir_data = null;
 $('#btn-connect').on('click', function(){
   var $btn = $(this).button('loading');
   // check if the socket is already connected.
@@ -35,16 +37,12 @@ $('#btn-connect').on('click', function(){
   
   socket.binaryType = "arraybuffer";
   socket.onopen = function(event){
-    console.log("websocket connected");
-    console.log(event);
     isopen = true;
     $btn.button('complete');
     $btn.removeClass("btn-primary btn-danger").addClass("btn-success");
   }
   
   socket.onerror = function(event){
-    console.log("there is error");
-    console.log(event);
     isopen = false;
     socket = null;
     $btn.button('error');
@@ -52,21 +50,11 @@ $('#btn-connect').on('click', function(){
   }
   
   socket.onclose = function(event){
-    console.log("websocket closed");
-    console.log(event);
     isopen = false;
     socket = null;
     $btn.button('reset');
     $btn.removeClass('btn-success btn-danger').addClass("btn-primary");
   }
-  
-    // list directories
-  $.ajax({
-    url: "http://" + server_ip + ":5000/list",
-    jsonp: 'callback',
-    dataType: "jsonp",
-    jsonpCallback: "process_list_dir"
-  });
   
   socket.onmessage = function(e){
     var selected_file = $('#source').attr('value');
@@ -112,6 +100,54 @@ $('#btn-connect').on('click', function(){
       }
     }
   }
+  
+  // list directories
+  if(file_tree_init){
+    $('#file-selector-modal').modal('show');
+  } else {
+    $.ajax({
+      url: "http://" + server_ip + ":5000/list",
+      jsonp: 'callback',
+      dataType: "jsonp",
+      success: function(response){
+        dir_data = response;
+        path = response['path'];
+        var dirs = response['dirs'];
+        var html = "";
+        for(var i=0; i<dirs.length; i++){
+          var files = response[dirs[i]];
+          html += build_modal_file_tree(dirs[i], files);
+        }
+        var files = response['files'];
+        html += build_modal_file_tree(null, files);
+        $('#file-selector').html(html);
+        $('#file-selector').treegrid().treegrid('collapseAll');
+        $('#file-selector-modal').modal('show');
+        $('.select-this').on('click', function(){
+          var is_checked = $(this).is(':checked');
+          var node = $(this).parent().parent();
+          if(node.treegrid('isNode') == false){
+            // some files out of the root directory
+            change_select_state(node, [node], is_checked, false);
+          } else {
+            if(node.treegrid('getParentNode') == null){
+              // this is already the parent node and it is is_checked, 
+              // so all the childs node should also be is_checked.
+              var childs = node.treegrid('getChildNodes');
+              change_select_state(node, childs, is_checked, true);
+            } else {
+              // we only need to change this node
+              var parent = node.treegrid('getParentNode');
+              change_select_state(parent, [node], is_checked, false);
+            }
+          }
+        });
+      }
+    });
+    file_tree_init = true;
+  }
+  
+  
 });
 // disable toolbar and double click edit, we don't need it.
 SyntaxHighlighter.defaults['toolbar'] = false;
@@ -124,7 +160,10 @@ function build_file_tree(parent, childs){
   // childs are list of tuples [(filename1, lines_no), (filename2, lines_no)...]
   var total_code_lines = 0;
   var html = "";
+  var childs_num = 0;
   for(var i=0; i<childs.length; i++){
+    if(!selected_files[childs[i][0]]) continue;
+    childs_num += 1;
     var class_value = "treegrid-" + childs[i][0];
     total_code_lines += childs[i][1];
     if(parent){
@@ -141,7 +180,7 @@ function build_file_tree(parent, childs){
     }
   }
   var parent_html = "";
-  if(parent != null){
+  if(parent != null && childs_num > 0){
     parent_html += '<tr class="treegrid-' + parent +'">';
     parent_html += '<td class="file-path">' + parent + '</td>';
     parent_html += '<td class="total-code-lines">' + total_code_lines + '</td>';
@@ -152,15 +191,14 @@ function build_file_tree(parent, childs){
 }
 
 // process list directories response from jsonp
-function process_list_dir(response){
-  path = response['path'];
-  var dirs = response['dirs'];
+function process_list_dir(){
+  var dirs = dir_data['dirs'];
   var html = "";
   for(var i = 0; i<dirs.length; i++){
-    var files = response[dirs[i]];
+    var files = dir_data[dirs[i]];
     html += build_file_tree(dirs[i], files);
   }
-  var files = response['files'];
+  var files = dir_data['files'];
   html += build_file_tree(null, files);
   $('.tree').html(html);
   $('.tree').treegrid().treegrid('collapseAll');
@@ -205,19 +243,20 @@ function show_coverage(data){
     var rootNodes = $('.tree').treegrid('getRootNodes');
     $.each(rootNodes, function(i){
       var className = rootNodes[i].classList[0];
-      var parent_id = $('.' + className).treegrid('getNodeId');
-      var childs = $('.treegrid-parent-' + parent_id);
+      var parent_id = $('.tree .' + className).treegrid('getNodeId');
+      var childs = $('.tree .treegrid-parent-' + parent_id);
       var total_run_lines = 0;
       $.each(childs, function(){
         total_run_lines += parseInt($(this).children('td[class="run-lines"]').text());
       });
-      $('.treegrid-' + parent_id).children('td[class="total-run-lines"]').text(total_run_lines);
-      var total_code_lines = parseInt($('.treegrid-' + parent_id).children('td[class="total-code-lines"]').text());
+      //console.log(total_code_lines);
+      $('.tree .treegrid-' + parent_id).children('td[class="total-run-lines"]').text(total_run_lines);
+      var total_code_lines = parseInt($('.tree .treegrid-' + parent_id).children('td[class="total-code-lines"]').text());
       var avg_cov_parent = 0;
       if(childs.length > 0 && total_code_lines > 0){
         avg_cov_parent = (total_run_lines * 100.0 / total_code_lines).toFixed(2);
       }
-      $('.treegrid-' + parent_id).children('td[class="file-cov"]').text(avg_cov_parent + "%");
+      $('.tree .treegrid-' + parent_id).children('td[class="file-cov"]').text(avg_cov_parent + "%");
     });
   }
 }
@@ -324,49 +363,24 @@ $('#chk-show-diff').on('click', function(){
 $('#show-file-selector-modal').on('click', function(){
   if(file_tree_init){
     $('#file-selector-modal').modal('show');
-  } else {
-    server_ip = $('#txt-server-ip').val();
-    $.ajax({
-      url: "http://" + server_ip + ":5000/list",
-      jsonp: 'callback',
-      dataType: "jsonp",
-      success: function(response){
-        path = response['path'];
-        var dirs = response['dirs'];
-        var html = "";
-        for(var i=0; i<dirs.length; i++){
-          var files = response[dirs[i]];
-          html += build_modal_file_tree(dirs[i], files);
-        }
-        var files = response['files'];
-        html += build_modal_file_tree(null, files);
-        $('#file-selector').html(html);
-        $('#file-selector').treegrid().treegrid('collapseAll');
-        $('#file-selector-modal').modal('show');
-        $('.select-this').on('click', function(){
-          var is_checked = $(this).is(':checked');
-          var node = $(this).parent().parent();
-          if(node.treegrid('isNode') == false){
-            change_select_state(node, [node], is_checked, false);
-          } else {
-            if(node.treegrid('getParentNode') == null){
-              // this is already the parent node and it is is_checked, 
-              // so all the childs node should also be is_checked.
-              var childs = node.treegrid('getChildNodes');
-              change_select_state(node, childs, is_checked, true);
-            } else {
-              var parent = node.treegrid('getParentNode');
-              change_select_state(parent, [node], is_checked, false);
-            }
-          }
-        });
-      }
-    });
-    file_tree_init = true;
   }
 });
 
-
+$('#btn-trace-start').on('click', function(){
+  var checked_boxes = $('.modal-body input:checkbox:checked');
+  for(var i=0; i<checked_boxes.length; i++){
+    var parent = $(checked_boxes[i]).parent().parent();
+    var file_name = parent.find('td[class="file-path"]').text();
+    selected_files[file_name] = true;
+  }
+  var unchecked_boxed = $('.modal-body input:checkbox:not(:checked)');
+  for(var i=0; i<unchecked_boxed.length; i++){
+    var parent = $(unchecked_boxed[i]).parent().parent();
+    var file_name = parent.find('td[class="file-path"]').text();
+    selected_files[file_name] = false;
+  }
+  process_list_dir();
+});
 
 function change_select_state(parent, childs, state, change_all){
   if(state == true){

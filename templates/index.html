@@ -80,7 +80,11 @@
           <button class="btn btn-default" id="stop_trace">stop_trace</button>
           <button class="btn btn-default" id="clear_trace">clear_trace</button>
         </div>
-        <table class="tree"></table>
+        <table class="tree">
+        </table>
+        <div class="input-group pull-right">
+          <button id="show-file-selector-modal" class="btn-default btn pull-right">添加文件</a>
+        </div>
       </div>
       <div id="page-content-wrapper">
         <div class="container-fluid">
@@ -115,7 +119,7 @@
                 </table>
               </div>
               <button class="btn btn-primary">保存测试结果</button>
-              <button id="show-file-selector-modal" class="btn-danger btn pull-right">添加文件</a>
+              
               <div id="source"></div>
             </div>
           </div>
@@ -140,8 +144,7 @@
               </table>
             </div>
             <div class="modal-footer">
-              <a class="btn btn-default" data-dismiss="modal">添加</a>
-              <a class="btn btn-primary" data-dismiss="modal">关闭</a>
+              <a class="btn btn-primary" data-dismiss="modal" id="btn-trace-start">Start Trace</a>
             </div>
           </form>
         </div>
