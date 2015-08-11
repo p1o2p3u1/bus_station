@@ -1,0 +1,161 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+	  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="代码测试覆盖率查看工具">
+    <meta name="author" content="ting.wu@corp.netease.com">
+    <title>Dashboard for Code Coverage</title>
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/syntaxhighlighter/styles/shCoreDefault.css" rel="stylesheet">
+    <link href="static/css/jquery.treegrid.css" rel="stylesheet">
+    <link href="http://hs.nie.netease.com/static/admin/assets/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="static/css/chosen.min.css" rel="stylesheet">
+    <link href="static/css/index.css" rel="stylesheet">
+	</head>
+  <body>
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="navbar-header">
+          <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="sidebar-toggle-box">
+            <div data-toggle="tooltip" title="Toggle Navigation" data-placement="right" class="icon-reorder tooltips" id="menu-toggle"></div>
+          </div>
+          <a class="logo" href="#">Dashboard</a>
+        </div>
+      <ul class="nav navbar-top-links navbar-right">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-user"></i>
+            {{ name }}
+            <i class="icon-caret-down"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-user">
+            <li>
+              <a href="#">
+                <i class="icon-plus"></i> 生成报告
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="icon-file"></i> 我的报告
+              </a>
+            </li>
+            <li class="divider"></li>
+              <li>
+                <a href="logout">
+                  <i class="icon-sign-out"> Logout</i>
+                </a>
+              </li>
+          </ul>
+        </li>
+      </ul>
+      <div id="navbar" class="navbar-collapse collapse">
+          <div class="navbar-form navbar-left">
+            <input type="text" class="form-control" placeholder="测试服务器ip" id="txt-server-ip" value="localhost">
+          </div>
+          <div class="navbar-form navbar-left">
+            <input type="text" class="form-control" placeholder="websocket端口号" id="txt-server-port" value="9000">
+          </div>
+          <div class="navbar-form navbar-left">
+            <button class="btn btn-primary" id="btn-connect" data-loading-text="连接中" data-complete-text="断开连接" data-error-text="连接失败">连接</button>
+          </div>
+      </div>
+    </nav>
+    <div id="wrapper" class="toggled">
+      <div id="sidebar-wrapper">
+        <div class="player text-center">
+          <button type="button" id="button_play" class="btn btn-default">
+            <i class="icon-play"></i>
+          </button>
+          <button type="button" id="button_stop" class="btn btn-default">
+            <i class="icon-stop"></i>
+          </button>
+          <button class="btn btn-default" id="test">test</button>
+          <button class="btn btn-default" id="start_trace">start_trace</button>
+          <button class="btn btn-default" id="stop_trace">stop_trace</button>
+          <button class="btn btn-default" id="clear_trace">clear_trace</button>
+        </div>
+        <table class="tree">
+        </table>
+        <div class="input-group pull-right">
+          <button id="show-file-selector-modal" class="btn-default btn pull-right">添加文件</a>
+        </div>
+      </div>
+      <div id="page-content-wrapper">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Filename：</th>
+                      <th>Revision</th>
+                      <th>Coverage %</th>
+                      <th>diff Revision</th>
+                      <th>diff Coverage %</th>
+                      <th>diff coverage result only</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td id="source-name"></td>
+                      <td id="source-revision"></td>
+                      <td id="source-cov"></td>
+                      <td id="diff-revision">
+                        <input type="text" placeholder="diff版本号" id="txt-diff-version">
+                      </td>
+                      <td id="diff-cov"></td>
+                      <td>
+                        <input type="checkbox" id="chk-show-diff">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <button class="btn btn-primary">保存测试结果</button>
+              
+              <div id="source"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal fade" id="file-selector-modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form class="form-horizontal">
+            <div class="modal-header">
+              <h4>选择测试文件</h4>
+            </div> 
+            <div class="modal-body">
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <input type="text" class="form-control" placeholder="Search" id="modal-file-search">
+                </div>
+              </div>
+              <table id="file-selector">
+              </table>
+            </div>
+            <div class="modal-footer">
+              <a class="btn btn-primary" data-dismiss="modal" id="btn-trace-start">Start Trace</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="static/syntaxhighlighter/scripts/shCore.js"></script>
+    <script type="text/javascript" src="static/syntaxhighlighter/scripts/shBrushPython.js"></script>
+    <script type="text/javascript" src="static/js/jquery.treegrid.min.js"></script>
+    <script type="text/javascript" src="static/js/chosen.jquery.min.js"></script>
+    <script type="text/javascript" src="static/js/index.js"></script>
+  </body>
+</html>

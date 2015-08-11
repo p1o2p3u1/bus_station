@@ -1,22 +1,22 @@
 .syntaxhighlighter .line.run{
   background-color: #ddffdd !important;
-  border-left: 2px solid #00ff00 !important;
+  border-left: 2px solid #ddffdd !important;
 }
 
 .syntaxhighlighter .line.mis{
   background-color: #ffdddd !important;
-  border-left: 2px solid #ff0000 !important;
+  border-left: 2px solid #ffdddd !important;
 }
 
 .syntaxhighlighter {
     width: 500px;
-    height: 900px;
+    height: 800px;
     overflow-y: auto !important;
     overflow-x: auto !important;
 }
 
 .sidebar {
-  width: 400px;
+  width: 550px;
   height: 900px;
   overflow-y: auto !important;
   overflow-x: auto !important;
@@ -25,6 +25,7 @@
 .sidebar-toggle-box {
     float: left;
     padding-right: 15px;
+    padding-left: 10px;
     margin-top: 20px;
 }
 
@@ -47,6 +48,9 @@ a.logo:hover, a.logo:focus {
     outline: none;
 }
 
+.progress {
+  margin-left: 20px;
+}
 
 #wrapper {
     padding-left: 0;
@@ -57,16 +61,16 @@ a.logo:hover, a.logo:focus {
 }
 
 #wrapper.toggled {
-    padding-left: 400px;
+    padding-left: 550px;
 }
 
 #sidebar-wrapper {
     z-index: 1000;
     position: absolute;
-    left: 400px;
+    left: 550px;
     width: 0;
     height: 900px;
-    margin-left: -400px;
+    margin-left: -550px;
     overflow-y: auto;
     overflow-x: auto;
     -webkit-transition: all 0.5s ease;
@@ -76,15 +80,59 @@ a.logo:hover, a.logo:focus {
 }
 
 #wrapper.toggled #sidebar-wrapper {
-    width: 400px;
+    width: 550px;
 }
 
 #page-content-wrapper {
-    position: absolute;
-    padding: 15px;
+    
 }
 
 #wrapper.toggled #page-content-wrapper {
-    position: absolute;
+
 }
 
+.navbar-top-links {
+    margin-right: 0;
+}
+
+.navbar-top-links li {
+    display: inline-block;
+}
+
+.navbar-top-links li:last-child {
+    margin-right: 15px;
+}
+
+.navbar-top-links li a {
+    padding: 15px;
+    min-height: 50px;
+}
+
+.navbar-top-links .dropdown-menu li {
+    display: block;
+}
+
+.navbar-top-links .dropdown-menu li:last-child {
+    margin-right: 0;
+}
+
+.navbar-top-links .dropdown-menu li a {
+    padding: 3px 20px;
+    min-height: 0;
+}
+
+.navbar-top-links .dropdown-menu li a div {
+    white-space: normal;
+}
+
+.navbar-top-links .dropdown-user {
+    right: 0;
+    left: auto;
+}
+
+.modal-body {
+  width: 580px;
+  height: 600px;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
