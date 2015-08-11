@@ -369,11 +369,17 @@ $('#show-file-selector-modal').on('click', function(){
 
 $('#btn-trace-start').on('click', function(){
   var checked_boxes = $('.modal-body input:checkbox:checked');
+  var files = []
   for(var i=0; i<checked_boxes.length; i++){
     var parent = $(checked_boxes[i]).parent().parent();
     var file_name = parent.find('td[class="file-path"]').text();
     selected_files[file_name] = true;
+    files.push(path + file_name);
   }
+  sendMessage(JSON.stringify({
+    "op": "files",
+    "files": files
+  }));
   var unchecked_boxed = $('.modal-body input:checkbox:not(:checked)');
   for(var i=0; i<unchecked_boxed.length; i++){
     var parent = $(unchecked_boxed[i]).parent().parent();

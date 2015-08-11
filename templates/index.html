@@ -75,10 +75,6 @@
           <button type="button" id="button_stop" class="btn btn-default">
             <i class="icon-stop"></i>
           </button>
-          <button class="btn btn-default" id="test">test</button>
-          <button class="btn btn-default" id="start_trace">start_trace</button>
-          <button class="btn btn-default" id="stop_trace">stop_trace</button>
-          <button class="btn btn-default" id="clear_trace">clear_trace</button>
         </div>
         <table class="tree">
         </table>
@@ -100,6 +96,7 @@
                       <th>diff Revision</th>
                       <th>diff Coverage %</th>
                       <th>diff coverage result only</th>
+                      <th><button class="btn btn-default btn-sm">保存测试结果</button></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -108,17 +105,18 @@
                       <td id="source-revision"></td>
                       <td id="source-cov"></td>
                       <td id="diff-revision">
-                        <input type="text" placeholder="diff版本号" id="txt-diff-version">
+                        <input class="form-control input-sm" type="text" placeholder="diff版本号" id="txt-diff-version">
                       </td>
                       <td id="diff-cov"></td>
                       <td>
                         <input type="checkbox" id="chk-show-diff">
                       </td>
+                      <td></td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              <button class="btn btn-primary">保存测试结果</button>
+              
               
               <div id="source"></div>
             </div>
