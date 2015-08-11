@@ -301,7 +301,6 @@ $('#button_stop').on('click', function(){
   }));
 });
 
-
 function sendMessage(message){
   if(isopen && socket != null){
     socket.send(message);
@@ -314,24 +313,6 @@ $('#test').on('click', function(){
     "files": ["/User/Ting/a.py"]
   });
   sendMessage(ms);
-});
-
-$('#start_trace').on('click', function(){
-  sendMessage(JSON.stringify({
-    "op": "start_trace"
-  }));
-});
-
-$('#clear_trace').on('click', function(){
-  sendMessage(JSON.stringify({
-    "op": "clear"
-  }));
-});
-
-$('#stop_trace').on('click', function(){
-  sendMessage(JSON.stringify({
-    "op": "stop_trace"
-  }));
 });
 
 $('#chk-show-diff').on('click', function(){
