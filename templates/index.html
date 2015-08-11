@@ -10,7 +10,6 @@
     <link href="static/syntaxhighlighter/styles/shCoreDefault.css" rel="stylesheet">
     <link href="static/css/jquery.treegrid.css" rel="stylesheet">
     <link href="http://hs.nie.netease.com/static/admin/assets/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="static/css/chosen.min.css" rel="stylesheet">
     <link href="static/css/index.css" rel="stylesheet">
 	</head>
   <body>
@@ -75,10 +74,6 @@
           <button type="button" id="button_stop" class="btn btn-default">
             <i class="icon-stop"></i>
           </button>
-          <button class="btn btn-default" id="test">test</button>
-          <button class="btn btn-default" id="start_trace">start_trace</button>
-          <button class="btn btn-default" id="stop_trace">stop_trace</button>
-          <button class="btn btn-default" id="clear_trace">clear_trace</button>
         </div>
         <table class="tree">
         </table>
@@ -108,7 +103,7 @@
                       <td id="source-revision"></td>
                       <td id="source-cov"></td>
                       <td id="diff-revision">
-                        <input type="text" placeholder="diff版本号" id="txt-diff-version">
+                        <input class="form-control input-sm" type="text" placeholder="diff版本号" id="txt-diff-version">
                       </td>
                       <td id="diff-cov"></td>
                       <td>
@@ -118,7 +113,7 @@
                   </tbody>
                 </table>
               </div>
-              <button class="btn btn-primary">保存测试结果</button>
+              
               
               <div id="source"></div>
             </div>
@@ -155,7 +150,6 @@
     <script type="text/javascript" src="static/syntaxhighlighter/scripts/shCore.js"></script>
     <script type="text/javascript" src="static/syntaxhighlighter/scripts/shBrushPython.js"></script>
     <script type="text/javascript" src="static/js/jquery.treegrid.min.js"></script>
-    <script type="text/javascript" src="static/js/chosen.jquery.min.js"></script>
     <script type="text/javascript" src="static/js/index.js"></script>
   </body>
 </html>
