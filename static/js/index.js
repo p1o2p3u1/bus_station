@@ -4,6 +4,7 @@ var path = "";
 var file_tree_init = false;
 var server_ip = "";
 var server_port = "";
+var file_server_port = "";
 var btn_state = "stop";
 var show_diff = false;
 var diff_list = [];
@@ -25,6 +26,7 @@ $('#btn-connect').on('click', function(){
   // get the websocket server ip and port
   server_ip = $('#txt-server-ip').val();
   server_port = $('#txt-server-port').val();
+  file_server_port = $('#txt-file-server-port').val();
   // check if they are empty
   if(server_ip == "" || server_port == ""){
     alert("server ip or port should not be empty");
@@ -106,7 +108,7 @@ $('#btn-connect').on('click', function(){
     $('#file-selector-modal').modal('show');
   } else {
     $.ajax({
-      url: "http://" + server_ip + ":5000/list",
+      url: "http://" + server_ip + ":" + file_server_port + "/list",
       jsonp: 'callback',
       dataType: "jsonp",
       success: function(response){
@@ -208,7 +210,7 @@ function process_list_dir(){
     var file_path = $(this).attr('value');
     file_path = encodeURIComponent(file_path);
     $.ajax({
-      url: 'http://' + server_ip + ':5000/file?path=' + file_path,
+      url: 'http://' + server_ip + ':' + file_server_port + '/file?path=' + file_path,
       jsonp: 'callback',
       dataType: 'jsonp',
       jsonpCallback: 'process_file_source'
@@ -331,7 +333,7 @@ $('#chk-show-diff').on('click', function(){
     }
     // get diff info
     $.ajax({
-      url: "http://" + server_ip + ":5000/diff?path=" + filename + '&old=' + old_version + '&cur=' + cur_version,
+      url: "http://" + server_ip + ":" + file_server_port + "/diff?path=" + filename + '&old=' + old_version + '&cur=' + cur_version,
       jsonp: 'callback',
       dataType: "jsonp",
       success: function(data){
