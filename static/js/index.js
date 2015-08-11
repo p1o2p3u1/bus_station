@@ -357,6 +357,7 @@ $('#chk-show-diff').on('click', function(){
         diff_list = data['update'];
       }
     });
+    // then waiting for the socket.onmessage call to display coverage result for diff
   }
 });
 
