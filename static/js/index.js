@@ -370,6 +370,10 @@ $('#btn-trace-start').on('click', function(){
   process_list_dir();
 });
 
+$('#btn-save-report').on('click', function(){
+  // collect the data and send post to api
+});
+
 function change_select_state(parent, childs, state, change_all){
   if(state == true){
     for(var i=0; i<childs.length; i++){
