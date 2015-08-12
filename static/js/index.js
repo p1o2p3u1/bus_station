@@ -338,6 +338,9 @@ function process_file_source(response){
   $('#source').html('<pre class="brush:python;">' + source + '</pre>');
   $('#source-name').text(filename);
   $('#source-revision').text(revision);
+  $('#txt-diff-version').text('');
+  $('#diff-cov').text('');
+  $('#chk-show-diff').prop('checked', false);
   SyntaxHighlighter.highlight();
 }
 
