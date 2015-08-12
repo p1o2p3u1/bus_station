@@ -150,7 +150,7 @@ function addEvents(){
           var files = response['files'];
           html += build_modal_file_tree(null, files);
           $('#file-selector').html(html);
-          $('#file-selector').treegrid();
+          $('#file-selector').treegrid().treegrid('collapseAll');
           $('#file-selector-modal').modal('show');
           $('.select-this').on('click', function(){
             var is_checked = $(this).is(':checked');
