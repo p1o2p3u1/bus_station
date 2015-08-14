@@ -130,7 +130,7 @@ a.logo:hover, a.logo:focus {
     left: auto;
 }
 
-.modal-body {
+.modal-file-select {
   width: 580px;
   height: 600px;
   overflow-y: auto !important;

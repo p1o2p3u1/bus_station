@@ -35,12 +35,12 @@
           </a>
           <ul class="dropdown-menu dropdown-user">
             <li>
-              <a href="#">
+              <a href="#" id="btn-generate-report">
                 <i class="icon-plus"></i> 生成报告
               </a>
             </li>
             <li>
-              <a href="#">
+              <a href="report.html" id="btn-show-reports">
                 <i class="icon-file"></i> 我的报告
               </a>
             </li>
@@ -122,7 +122,7 @@
             <div class="modal-header">
               <h4>选择测试文件</h4>
             </div> 
-            <div class="modal-body">
+            <div class="modal-body modal-file-select">
               <div class="form-group">
                 <div class="col-sm-12">
                   <input type="text" class="form-control" placeholder="Search" id="modal-file-search">
@@ -138,11 +138,50 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="test-confirm-dialog" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="form-horizontal">
+            <div class="modal-header">
+              <h4>保存测试报告</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="txt-test-name" class="col-md-2 control-label">测单名称</label>
+                <div class="col-md-10">
+                  <input type="text" class="form-control" id="txt-test-name" placeholder="给本次测试起个名字吧">
+                </div>
+              </div>
+              <div class="table-test-result">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>文件名</th>
+                      <th>代码行数</th>
+                      <th>测试行数</th>
+                      <th>覆盖率</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tb-test-result">
+                  
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" id="btn-confirm-test">确认</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
     <script type="text/javascript" src="static/js/jquery.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/syntaxhighlighter/scripts/shCore.js"></script>
     <script type="text/javascript" src="static/syntaxhighlighter/scripts/shBrushPython.js"></script>
     <script type="text/javascript" src="static/js/jquery.treegrid.min.js"></script>
+    <script type="text/javascript" src="static/js/jquery.bootstrap.min.js"></script>
     <script type="text/javascript" src="static/js/index.js"></script>
   </body>
 </html>

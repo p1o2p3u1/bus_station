@@ -22,8 +22,10 @@ var selected_files = {};
 var dir_data = null;
 // current selected file
 var cur_select_file = "";
-// current coverage data;
+// previous coverage data, display coverage data with increment.
 var pre_coverage_data = null;
+// all coverage data to generate report
+var coverage_data = null;
 
 function addEvents(){
   $('#btn-connect').on('click', function(){
@@ -77,6 +79,7 @@ function addEvents(){
     socket.onmessage = function(e){
       var selected_file = $('#source').attr('value');
       var obj = JSON.parse(e.data);
+      coverage_data = obj;
       show_coverage(obj);
       if(selected_file && selected_file != ""){
         var full_file_path = path + selected_file;
@@ -231,11 +234,6 @@ function addEvents(){
     }
     process_list_dir();
   });
-
-  $('#btn-save-report').on('click', function(){
-    // collect the data and send post to api
-  });
-  
   
   // funny
   $("#menu-toggle").click(function(e) {
@@ -244,7 +242,51 @@ function addEvents(){
   });
 
   $('[data-toggle="tooltip"]').tooltip();
-
+  
+  $('#btn-generate-report').click(function(e){
+    e.preventDefault();
+    if(isopen && coverage_data != null){
+      var html = "";
+      for(var f in coverage_data){
+        html += '<tr><td>' + f + '</td>';
+        html += '<td>' + coverage_data[f]['code'].length + '</td>';
+        html += '<td>' + coverage_data[f]['executed'].length + '</td>';
+        html += '<td>' + (parseFloat(coverage_data[f]['coverage']) * 100).toFixed(2) + '%</td>';
+      }
+      $('#tb-test-result').html(html);
+      $('#test-confirm-dialog').modal('show');
+    } else {
+      alert("尚未开始收集数据");
+    }
+  });
+  
+  $('#btn-confirm-test').on('click', function(){
+    var test_name = $('#txt-test-name').val();
+    if(test_name == ""){
+      alert('测单名称不能为空。');
+    } else {
+      var data = {
+        'job_name': test_name,
+        'coverage': coverage_data,
+        'host': server_ip,
+        'port': file_server_port,
+        'path': path
+      };
+      $.ajax({
+        url: '/report',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        success: function (e) {
+          console.log(e);
+          alert('success');
+        }
+      });
+      $('#test-confirm-dialog').modal('hide');
+    }
+  });
+  
 }
 
 // disable toolbar and double click edit, we don't need it.

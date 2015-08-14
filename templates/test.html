@@ -4,31 +4,37 @@
   </head>
   
   <body>
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover table-striped">
-        <thead>
-            <tr>
-                <th>Item ID</th>
-                <th>Item Name</th>
-                <th>Item Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>Item 1</td>
-                <td>$1</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Item 2</td>
-                <td>$2</td>
-            </tr>
-        </tbody>
-      </table>
+    <button class="btn btn-default" id="test">aaa</button>
+    <div id="test-confirm-dialog" class="hide">
+      <div class="form-group">
+        <label for="txt-test-name" class="col-md-2 control-label">测单名称</label>
+        <div class="col-md-10">
+          <input type="text" class="form-control" id="txt-test-name" placeholder="">
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <table id="test-result"></table>
+      </div>
     </div>
-
     <script type="text/javascript" src="../static/js/jquery.min.js"></script>
     <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/js/jquery.bootstrap.min.js"></script>
+    <script>
+      $('#test').on('click', function(){
+        $('#test-confirm-dialog').dialog({
+          title: 'demo',
+          onClose: function() { $(this).dialog("close"); },
+          buttons: {
+            "Close": function(){
+
+            },
+            "确定": function(){
+
+            } 
+          }
+        });
+      });
+      
+    </script>
   </body>
 </html>
