@@ -48,8 +48,8 @@ def show_report():
     if 'username' not in session:
         return redirect(url_for('login'))
     user_id = session['username']
-    reports = report_db.query_reports_by_user_id(user_id)
-    return render_template('report.html', reports=reports)
+    jobs = report_db.query_jobs_by_user_id(user_id)
+    return render_template('report.html', reports=jobs)
 
 
 @app.route("/report", methods=['POST'])
