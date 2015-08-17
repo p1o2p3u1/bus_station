@@ -251,7 +251,7 @@ function addEvents(){
     if(isopen && coverage_data != null){
       var html = "";
       for(var f in coverage_data){
-        html += '<tr><td>' + f + '</td>';
+        html += '<tr><td>' + f.replace(path, '') + '</td>';
         html += '<td>' + coverage_data[f]['code'].length + '</td>';
         html += '<td>' + coverage_data[f]['executed'].length + '</td>';
         html += '<td>' + (parseFloat(coverage_data[f]['coverage']) * 100).toFixed(2) + '%</td>';
@@ -287,6 +287,18 @@ function addEvents(){
         }
       });
       $('#test-confirm-dialog').modal('hide');
+    }
+  });
+  
+  $('#modal-file-search').on('input', function(){
+    var query = $('#modal-file-search').val();
+    if(query == ""){
+      $('#file-selector tr[class*="treegrid-parent"]').show();
+      $('#file-selector').treegrid('collapseAll');
+    } else {
+      $('#file-selector').treegrid('expandAll');
+      $('#file-selector tr[class*="treegrid-parent"]').hide()
+      $('#file-selector tr[class*="' + query + '"]').show();
     }
   });
   

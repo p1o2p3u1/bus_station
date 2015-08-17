@@ -3,11 +3,14 @@
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
   </head>
   <body>
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+    </nav>
     <div class="container">
       <div class="row">
         <table class="table">
           <thead>
             <tr>
+              <th></th>
               <th>id</th>
               <th>名称</th>
               <th>测试人</th>
@@ -17,6 +20,7 @@
           <tbody>
           {% for job in jobs %}
             <tr>
+              <td><input type="checkbox" class="chk-job-merge" id="{{ job['id'] }}"></td>
               <td>{{ job['id'] }}</td>
               <td><a href="report_detail.html?id={{ job['id'] }}" target="_blank">{{ job['name'] }}</a></td>
               <td>{{ job['user_id'] }}</td>

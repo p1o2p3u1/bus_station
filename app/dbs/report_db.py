@@ -28,6 +28,7 @@ def query_jobs_by_user_id(user_id):
     rows = g.cursor.fetchall()
     return rows
 
+
 def query_reports_by_job_id(job_id):
     """
     just like the function name..
@@ -44,6 +45,7 @@ def query_reports_by_job_id(job_id):
         row['exec'] = row['exec'].split(',')
         row['miss'] = row['miss'].split(',')
     return rows
+
 
 def query_reports_by_job_ids(job_ids):
     """
@@ -63,6 +65,7 @@ def query_reports_by_job_ids(job_ids):
         row['miss'] = row['miss'].split(',')
     return rows
 
+
 def query_reports_by_user_id(user_id):
     """
     just like the function name
@@ -74,6 +77,7 @@ def query_reports_by_user_id(user_id):
     result = query_reports_by_job_ids(job_ids)
     return result
 
+
 def query_all_jobs():
     """
     I'm the boss, show me all your jobs
@@ -84,7 +88,8 @@ def query_all_jobs():
     rows = g.cursor.fetchall()
     return rows
 
-def save_reports(user_id, job_name, reports):
+
+def save_reports(user_id, job_name, reports, auto_commit=True):
     """
     when user click 'save report' button
     :param user_id: id of the user
@@ -109,7 +114,8 @@ def save_reports(user_id, job_name, reports):
                 report['cov_result'])
         batch.append(data)
     g.cursor.executemany(sql, batch)
-    g.conn.commit()
+    if auto_commit:
+        g.conn.commit()
     return job_id
 
 
@@ -123,4 +129,62 @@ def query_coverage_by_report_id(report_id):
         result['source'] = row['source']
         result['exec'] = row['exec'].split(',')
         result['miss'] = row['miss'].split(',')
+    return result
+
+
+def merge_jobs(user_id, job_name, job_list):
+    """
+    merge those jobs into one new job
+    :param name:
+    :param merge_list:
+    :return:
+    """
+    # merge the coverage result when (filename, version) are the same.
+    reports = query_merge_result(job_list)
+    job_id = save_reports(user_id, job_name, reports, auto_commit=False)
+    # delete the original jobs and reports
+    sql = "delete from job where id in (%s)"
+    in_args = ', '.join(map(lambda x: '%s', job_list))
+    sql %= in_args
+    pass
+
+
+def query_merge_result(merge_list):
+    """
+    pre-check the merge result
+    :param merge_list:
+    :return:
+    """
+    reports = query_reports_by_job_ids(merge_list)
+    # merge the coverage result when (filename, version) are the same.
+    tmp = {}
+    for report in reports:
+        key = (report['filename'], report['version'])
+        if key in tmp:
+            # merge
+            tmp[key]['exec'] = set(report['exec']) | tmp[key]['exec']
+            tmp[key]['miss'] = set(report['line']) - tmp[key]['exec']
+        else:
+            tmp[key] = {
+                "line": set(report['line']),
+                "filename": report['filename'],
+                "version": report['version'],
+                "exec": set(report['exec']),
+                "source": report['source'],
+                "miss": set(report['miss'])
+            }
+    result = []
+    for _, val in tmp.iteritems():
+        t = {
+            'filename': val['filename'],
+            'version': val['version'],
+            'source': val['source'],
+            'line': list(val['line']),
+            'exec': list(val['exec']),
+            'miss': list(val['miss'])
+        }
+        if len(t['line']) == 0:
+            t['coverage'] = 1
+        else:
+            t['coverage'] = float(len(t['exec'])) / len(t['line'])
     return result
