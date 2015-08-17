@@ -9,13 +9,20 @@
           <thead>
             <tr>
               <th>id</th>
+              <th>名称</th>
               <th>测试人</th>
               <th>日期</th>
-              <th>名称</th>
             </tr>
           </thead>
           <tbody>
-          {{len(reports)}}
+          {% for job in jobs %}
+            <tr>
+              <td>{{ job['id'] }}</td>
+              <td><a href="report_detail.html?id={{ job['id'] }}" target="_blank">{{ job['name'] }}</a></td>
+              <td>{{ job['user_id'] }}</td>
+              <td>{{ job['time'] }}</td>
+            </tr>
+          {% endfor %}
           </tbody>
         </table>
       </div>

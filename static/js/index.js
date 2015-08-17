@@ -91,12 +91,7 @@ function addEvents(){
             var exec = $(exec1).filter(diff_list);
             var missing = $(diff_list).not(exec);
             var file_cov = cov['coverage'];
-            $.each(exec, function(i){
-              $('.number' + exec[i]).removeClass('mis').addClass('run');
-            });
-            $.each(missing, function(i){
-              $('.number' + missing[i]).removeClass('run').addClass('mis');
-            });
+            colorful_coverage(exec, missing);
             if(diff_list.length == 0){
               $('#diff-cov').text('100%');
             } else {
@@ -182,11 +177,11 @@ function addEvents(){
   
   $('#chk-show-diff').on('click', function(){
     show_diff = $(this).is(':checked');
+    // remove the original coverage info
+    $('#source .line').removeClass('mis').removeClass('run');
+    var filename = $('#source').attr('value');
+    if(!filename || filename == "") return;
     if(show_diff){
-      // remove the original coverage info
-      $('#source .line').removeClass('mis').removeClass('run');
-      var filename = $('#source').attr('value');
-      if(!filename || filename == "") return;
       filename = encodeURIComponent(filename);
       var cur_version = $("#source-revision").text();
       var old_version = $("#txt-diff-version").val();
@@ -204,6 +199,14 @@ function addEvents(){
         }
       });
       // then waiting for the socket.onmessage call to display coverage result for diff
+    } else {
+      var file_path = path + filename
+      var cov = coverage_data[file_path];
+      if(cov){
+        var execd = cov['executed'];
+        var missing = cov['missed'];
+        colorful_coverage(execd, missing);
+      }
     }
   });
 
@@ -360,6 +363,9 @@ function process_list_dir(){
     if(cur_select_file == ""){
       cur_select_file = file_path;
     }
+    pre_coverage_data = null;
+    show_diff = false;
+    diff_list = [];
     file_path = encodeURIComponent(file_path);
     $.ajax({
       url: 'http://' + server_ip + ':' + file_server_port + '/file?path=' + file_path,
@@ -380,7 +386,7 @@ function process_file_source(response){
   $('#source').html('<pre class="brush:python;">' + source + '</pre>');
   $('#source-name').text(filename);
   $('#source-revision').text(revision);
-  $('#txt-diff-version').text('');
+  $('#txt-diff-version').prop('value', '');
   $('#diff-cov').text('');
   $('#chk-show-diff').prop('checked', false);
   SyntaxHighlighter.highlight();

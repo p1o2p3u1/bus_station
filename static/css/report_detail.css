@@ -1,0 +1,9 @@
+.syntaxhighlighter .line.run{
+  background-color: #ddffdd !important;
+  border-left: 2px solid #ddffdd !important;
+}
+
+.syntaxhighlighter .line.mis{
+  background-color: #ffdddd !important;
+  border-left: 2px solid #ffdddd !important;
+}

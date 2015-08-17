@@ -22,7 +22,7 @@ def query_jobs_by_user_id(user_id):
     :param user_id: the id of the user
     :return: list of jobs
     """
-    sql = "select id, time, name from job where user_id = %s order by time desc"
+    sql = "select id, user_id, time, name from job where user_id = %s order by time desc"
     data = (user_id, )
     g.cursor.execute(sql, data)
     rows = g.cursor.fetchall()
@@ -34,7 +34,7 @@ def query_reports_by_job_id(job_id):
     :param job_id: id of the job
     :return: list of reports for a specific job
     """
-    sql = "select id, job_id, filename, version, source, line, exec, miss, cov_result" \
+    sql = "select id, job_id, filename, version, line, exec, miss, cov_result" \
           " from report where job_id = %s"
     data = (job_id,)
     g.cursor.execute(sql, data)
@@ -111,3 +111,16 @@ def save_reports(user_id, job_name, reports):
     g.cursor.executemany(sql, batch)
     g.conn.commit()
     return job_id
+
+
+def query_coverage_by_report_id(report_id):
+    sql = "select source, exec, miss from report where id = %s"
+    data = (report_id, )
+    g.cursor.execute(sql, data)
+    rows = g.cursor.fetchall()
+    result = {}
+    for row in rows:
+        result['source'] = row['source']
+        result['exec'] = row['exec'].split(',')
+        result['miss'] = row['miss'].split(',')
+    return result

@@ -2,7 +2,8 @@ from flask import Flask, \
     render_template, \
     request, session, \
     redirect, \
-    url_for
+    url_for, \
+    jsonify
 from app.wraps.db_wrapper import request_db_connect
 from app.dbs import report_db
 from urllib import quote
@@ -49,7 +50,7 @@ def show_report():
         return redirect(url_for('login'))
     user_id = session['username']
     jobs = report_db.query_jobs_by_user_id(user_id)
-    return render_template('report.html', reports=jobs)
+    return render_template('report.html', jobs=jobs)
 
 
 @app.route("/report", methods=['POST'])
@@ -87,6 +88,32 @@ def save_reports():
         "success": True
     })
 
+
+@app.route('/report_detail.html')
+@request_db_connect
+def report_detail():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    job_id = request.args.get('id', None)
+    if job_id is None:
+        return "id should not be empty"
+    else:
+        reports = report_db.query_reports_by_job_id(job_id)
+        print reports
+        return render_template('report_detail.html', reports=reports)
+
+
+@app.route('/report_cov')
+@request_db_connect
+def report_cov():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    report_id = request.args.get('id', None)
+    if report_id is None:
+        return ""
+    report = report_db.query_coverage_by_report_id(report_id)
+    print report
+    return jsonify(report)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8889, debug=True)
