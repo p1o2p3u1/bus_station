@@ -149,7 +149,8 @@ def merge_jobs(user_id, job_name, job_list):
     rows = g.cursor.fetchall()
     username = set()
     for row in rows:
-        username.add(row['username'])
+        names = row['username'].split(',')
+        username |= set(names)
     username = ','.join(x for x in username)
     job_id = save_reports(username, user_id, job_name, reports, auto_commit=True)
     return job_id

@@ -366,7 +366,7 @@ function process_list_dir(){
   }
   var files = dir_data['files'];
   html += build_file_tree(null, files);
-  $('.tree').html(html);
+  $('#tree-body').html(html);
   $('.tree').treegrid().treegrid('collapseAll');
   file_tree_init = true;
   $('.file_source').on('click', function(){
