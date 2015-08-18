@@ -7,6 +7,9 @@
     </nav>
     <div class="container">
       <div class="row">
+        <div>
+          <button class="btn btn-default" id="merge-test">合并测单</button>
+        </div>
         <table class="table">
           <thead>
             <tr>
@@ -22,13 +25,51 @@
             <tr>
               <td><input type="checkbox" class="chk-job-merge" id="{{ job['id'] }}"></td>
               <td>{{ job['id'] }}</td>
-              <td><a href="report_detail.html?id={{ job['id'] }}" target="_blank">{{ job['name'] }}</a></td>
-              <td>{{ job['user_id'] }}</td>
+              <td><a href="report_detail.html?id={{ job['id'] }}" target="_blank">{{ job['jobname'] }}</a></td>
+              <td>{{ job['username'] }}</td>
               <td>{{ job['time'] }}</td>
             </tr>
           {% endfor %}
           </tbody>
         </table>
+      </div>
+    </div>
+    <div class="modal fade" id="test-confirm-dialog" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="form-horizontal">
+            <div class="modal-header">
+              <h4>合并测试报告</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="txt-test-name" class="col-md-2 control-label">测单名称</label>
+                <div class="col-md-10">
+                  <input type="text" class="form-control" id="txt-test-name" placeholder="给本次测试起个名字吧">
+                </div>
+              </div>
+              <div class="table-test-result">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>文件名</th>
+                      <th>版本</th>
+                      <th>代码行数</th>
+                      <th>测试行数</th>
+                      <th>覆盖率%</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tb-test-result">
+                  
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" id="btn-confirm-test">确认</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <script type="text/javascript" src="static/js/jquery.min.js"></script>

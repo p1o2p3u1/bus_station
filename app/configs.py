@@ -8,6 +8,7 @@ db_name = config.get('mysql', 'dbname')
 db_host = config.get('mysql', 'host')
 db_port = config.get('mysql', 'port')
 db_charset = config.get('mysql', 'charset')
+admins = config.get('admin', 'user_ids').split(',')
 
 
 

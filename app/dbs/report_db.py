@@ -2,7 +2,7 @@ from flask import g
 import time
 
 
-def save_user_job(user_id, job_name):
+def save_user_job(username, user_id, job_name):
     """
     save the test job for the user
     :param user_id: id of the user
@@ -10,8 +10,8 @@ def save_user_job(user_id, job_name):
     :return: id of this test job
     """
     now = time.strftime('%Y-%m-%d %H:%M:%S')
-    sql = "insert into job (time, user_id, name) values (%s, %s, %s)"
-    data = (now, user_id, job_name)
+    sql = "insert into job (time, username, userid, jobname) values (%s, %s, %s, %s)"
+    data = (now, username, user_id, job_name)
     g.cursor.execute(sql, data)  # people say that this can prevent sql injection
     return g.cursor.lastrowid
 
@@ -22,7 +22,7 @@ def query_jobs_by_user_id(user_id):
     :param user_id: the id of the user
     :return: list of jobs
     """
-    sql = "select id, user_id, time, name from job where user_id = %s order by time desc"
+    sql = "select id, userid, username, time, jobname from job where userid = %s order by time desc"
     data = (user_id, )
     g.cursor.execute(sql, data)
     rows = g.cursor.fetchall()
@@ -83,13 +83,13 @@ def query_all_jobs():
     I'm the boss, show me all your jobs
     :return:
     """
-    sql = "select id, user_id, time, name from job order by time desc"
+    sql = "select id, username, userid, time, jobname from job order by time desc"
     g.cursor.execute(sql)
     rows = g.cursor.fetchall()
     return rows
 
 
-def save_reports(user_id, job_name, reports, auto_commit=True):
+def save_reports(username, user_id, job_name, reports, auto_commit=True):
     """
     when user click 'save report' button
     :param user_id: id of the user
@@ -98,7 +98,7 @@ def save_reports(user_id, job_name, reports, auto_commit=True):
     :return: id of this job
     """
     # first get the id of this test job
-    job_id = save_user_job(user_id, job_name)
+    job_id = save_user_job(username, user_id, job_name)
     sql = "insert into report " \
           "(job_id, filename, version, source, line, exec, miss, cov_result) " \
           "values (%s, %s, %s, %s, %s, %s, %s, %s)"
@@ -134,19 +134,25 @@ def query_coverage_by_report_id(report_id):
 
 def merge_jobs(user_id, job_name, job_list):
     """
-    merge those jobs into one new job
+    Merge those jobs into one new job.
+    The username should be the combination of all the job's username
     :param name:
     :param merge_list:
     :return:
     """
     # merge the coverage result when (filename, version) are the same.
     reports = query_merge_result(job_list)
-    job_id = save_reports(user_id, job_name, reports, auto_commit=False)
-    # delete the original jobs and reports
-    sql = "delete from job where id in (%s)"
-    in_args = ', '.join(map(lambda x: '%s', job_list))
+    sql = "select username from job where id in (%s)"
+    in_args = ','.join(map(lambda x: '%s', job_list))
     sql %= in_args
-    pass
+    g.cursor.execute(sql, job_list)
+    rows = g.cursor.fetchall()
+    username = set()
+    for row in rows:
+        username.add(row['username'])
+    username = ','.join(x for x in username)
+    job_id = save_reports(username, user_id, job_name, reports, auto_commit=True)
+    return job_id
 
 
 def query_merge_result(merge_list):
@@ -171,7 +177,7 @@ def query_merge_result(merge_list):
                 "version": report['version'],
                 "exec": set(report['exec']),
                 "source": report['source'],
-                "miss": set(report['miss'])
+                "miss": report['miss']
             }
     result = []
     for _, val in tmp.iteritems():
@@ -184,7 +190,8 @@ def query_merge_result(merge_list):
             'miss': list(val['miss'])
         }
         if len(t['line']) == 0:
-            t['coverage'] = 1
+            t['cov_result'] = 1
         else:
-            t['coverage'] = float(len(t['exec'])) / len(t['line'])
+            t['cov_result'] = float(len(t['exec'])) / len(t['line'])
+        result.append(t)
     return result

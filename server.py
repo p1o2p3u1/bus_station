@@ -9,6 +9,7 @@ from flask import Flask, \
     jsonify
 from app.wraps.db_wrapper import request_db_connect
 from app.dbs import report_db
+import app.configs as configs
 from urllib import quote
 import base64
 import hashlib
@@ -19,14 +20,16 @@ import app.openid as openid
 
 app = Flask(__name__)
 app.secret_key = 'hi09jh123oi3tt0w^%@#*%^(GU)*UOVI&TD'
-
+admins = configs.admins
 
 @app.route("/")
 def index():
     if not session.get('email'):
         return redirect(url_for('login'))
     username = session.get('fullname')
-    return render_template('index.html', name=username)
+    userid = session.get('email')
+    admin = session.get('admin')
+    return render_template('index.html', name=username, admin=admin)
 
 
 @app.route("/login")
@@ -61,6 +64,10 @@ def login_callback():
         return render_template('error.html', message='Fail to get email and fullname')
     session['email'] = email
     session['fullname'] = fullname
+    if email in admins:
+        session['admin'] = True
+    else:
+        session['admin'] = False
     return redirect(next_url)
 
 
@@ -68,7 +75,8 @@ def login_callback():
 def logout():
     session.pop('fullname', None)
     session.pop('email', None)
-    return redirect(url_for('index'))
+    session.pop('admin', None)
+    return redirect(url_for('login'))
 
 
 @app.route("/report.html")
@@ -76,8 +84,13 @@ def logout():
 def show_report():
     if not session.get('email'):
         return redirect(url_for('login'))
-    user_id = session['fullname']
-    jobs = report_db.query_jobs_by_user_id(user_id)
+    username = session['fullname']
+    userid = session.get('email')
+    admin = session.get('admin')
+    if admin is True:
+        jobs = report_db.query_all_jobs()
+    else:
+        jobs = report_db.query_jobs_by_user_id(userid)
     return render_template('report.html', jobs=jobs)
 
 
@@ -86,7 +99,8 @@ def show_report():
 def save_reports():
     if not session.get('email'):
         return redirect(url_for('login'))
-    user_id = session['fullname']
+    username = session['fullname']
+    userid = session['email']
     job_name = request.json['job_name']
     coverage = request.json['coverage']
     host = request.json['host']
@@ -109,7 +123,7 @@ def save_reports():
         report['source'] = text['text']
         report['version'] = text['Revision']
         reports.append(report)
-    job_id = report_db.save_reports(user_id, job_name, reports)
+    job_id = report_db.save_reports(username, userid, job_name, reports)
     session['job_id'] = job_id
     return json.dumps({
         "id": job_id,
@@ -127,7 +141,6 @@ def report_detail():
         return "id should not be empty"
     else:
         reports = report_db.query_reports_by_job_id(job_id)
-        print reports
         return render_template('report_detail.html', reports=reports)
 
 
@@ -140,7 +153,6 @@ def report_cov():
     if report_id is None:
         return ""
     report = report_db.query_coverage_by_report_id(report_id)
-    print report
     return jsonify(report)
 
 
@@ -149,13 +161,14 @@ def report_cov():
 def merge_jobs():
     if not session.get('email'):
         return redirect(url_for('login'))
+    userid = session['email']
     merge_list = request.json['list']
     new_name = request.json['name']
     if merge_list is None or len(merge_list) == 0 or new_name is None:
         return jsonify({
             "success": False
         })
-    result = report_db.merge_jobs(new_name, merge_list)
+    result = report_db.merge_jobs(userid, new_name, merge_list)
     return jsonify({
         "success": True,
         "job": result
@@ -171,7 +184,10 @@ def check_merge():
         return "invalid parameter"
 
     result = report_db.query_merge_result(merge_list.split(','))
-    return jsonify(result)
+    return jsonify({
+        'result': result,
+        'success': True
+    })
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8889, debug=True)
+    app.run(host="0.0.0.0", threaded=True, port=8889, debug=True)
