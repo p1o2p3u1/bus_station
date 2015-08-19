@@ -6,21 +6,31 @@
 .treegrid-expander-collapsed{background-image: url(../img/expand.png);}
 
 table.tree, 
-#file-selector{
+#file-selector,
+.table-revision,
+.table-test-dashboard{
   font:14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color:#777;
   font-weight:300;
   border-collapse:collapse;
   width: 100%;
+  table-layout: fixed;
 }
 
 table.tree th, 
 table.tree td, 
 #file-selector th, 
-#file-selector td {
+#file-selector td,
+.table-revision th,
+.table-revision td,
+.table-test-dashboard th,
+.table-test-dashboard td{
   text-align:left;
   padding:5px 10px;
   border-bottom:1px solid #e5e5e5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 table.tree dt, 
@@ -51,7 +61,8 @@ table.tree td.file-cov, #file-selector td.is-select {
   width: 10%;
 }
 
-.table-test-result {
+.table-test-result,
+.table-revision-wrapper{
   width: 570px;
   height: 500px;
   overflow-y: auto !important;

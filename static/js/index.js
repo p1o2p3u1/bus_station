@@ -302,6 +302,30 @@ function addEvents(){
     }
   });
   
+  $('#txt-diff-version').on('click', function(){
+    // get revision data via ajax
+    var filename = $('#source').attr('value');
+    if(!filename || filename == "") return;
+    filename = encodeURIComponent(filename);
+    load_svn_logs(filename, 10);
+    $('#revision-selector-modal').modal('show');
+  });
+  
+  $('#btn-refresh-logs').on('click', function(){
+    var log_num = $('#txt-logs-num').val();
+    if(!log_num || log_num == "") return;
+    var filename = $('#source').attr('value');
+    if(!filename || filename == "") return;
+    load_svn_logs(filename, log_num);
+  });
+
+  
+  $('#btn-confirm-revision').on('click', function(){
+    $('#txt-diff-version').prop('value', 10);
+    $('#revision-selector-modal').modal('hide');
+    $('#txt-diff-version').focus();
+  });
+  
 }
 
 // disable toolbar and double click edit, we don't need it.
@@ -336,7 +360,7 @@ function build_file_tree(parent, childs){
       class_value += " treegrid-parent-" + parent;
     }
     html += '<tr class="' + class_value +'">'
-    html += '<td class="file-path"><span class="file_source" value="' + childs[i][0] + '">' + childs[i][0] + '</span></td>';
+    html += '<td class="file-path"><span class="file_source" value="' + childs[i][0] + '" title="' + childs[i][0] + '">' + childs[i][0] + '</span></td>';
     html += '<td class="code-lines">' + childs[i][1] + '</td>'
     html += '<td class="run-lines">0</td>'
     if(parent){
@@ -397,6 +421,7 @@ function process_file_source(response){
   $('#source').attr('value', filename);
   $('#source').html('<pre class="brush:python;">' + source + '</pre>');
   $('#source-name').text(filename);
+  $('#source-name').attr('title', filename);
   $('#source-revision').text(revision);
   $('#txt-diff-version').prop('value', '');
   $('#diff-cov').text('');
@@ -482,6 +507,32 @@ function build_modal_file_tree(parent, childs){
     html += '<td class="is-select"><input type="checkbox" class="select-this"></td></tr>'
   }
   return html;
+}
+
+function load_svn_logs(filename, limit){
+  $.ajax({
+    url: 'http://' + server_ip + ':' + file_server_port + '/log?file=' + filename + '&num=' + limit,
+    jsonp: 'callback',
+    dataType: 'jsonp',
+    success: function(data){
+      var logs = data['logs'];
+      var html = "";
+      for(var i=0; i<logs.length; i++){
+        html += '<tr><td>' + logs[i]['revision'] + '</td>';
+        html += '<td>' + logs[i]['author'] + '</td>';
+        html += '<td>' + logs[i]['date'] + '</td>';
+        html += '<td title="' + logs[i]['comment'] + '">' + logs[i]['comment'] + '</td>';
+      }
+      $('#tb-version-content').html(html);
+        
+      $('#tb-version-content tr').on('click', function(){
+        $('#tb-version-content tr').css('background-color', '');
+        $(this).css('background-color', '#ddffdd');
+        var version = $(this).children().first().text();
+        console.log(version);
+      });
+    }
+  });
 }
 
 
