@@ -1,1 +1,1 @@
-![](http://git.163-inc.com/ting.wu/bus_station/blob/master/docs/result.png)
+![](http://git.163-inc.com/ting.wu/bus_station/raw/master/docs/result.png)
