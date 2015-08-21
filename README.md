@@ -11,3 +11,7 @@ Bus station for all the regular buses. Display the python coverage result in rea
 2. Install regularbus and gas_station for it.
 3. open and edit `app.config` to connect to your own database. You can find the sql script in gas_station project.
 4. `python server.py` and enjoy.
+
+## More info
+
+Please visit wiki: http://git.163-inc.com/ting.wu/bus_station/wikis/home
