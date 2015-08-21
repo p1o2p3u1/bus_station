@@ -26,6 +26,8 @@ var cur_select_file = "";
 var pre_coverage_data = null;
 // all coverage data to generate report
 var coverage_data = null;
+// userid for svn call
+var userid = btoa($('#i-user-id').attr('value'));
 
 function addEvents(){
   $('#btn-connect').on('click', function(){
@@ -133,7 +135,7 @@ function addEvents(){
       $('#file-selector-modal').modal('show');
     } else {
       $.ajax({
-        url: "http://" + server_ip + ":" + file_server_port + "/list",
+        url: "http://" + server_ip + ":" + file_server_port + "/list?checker=" + userid,
         jsonp: 'callback',
         dataType: "jsonp",
         success: function(response){
@@ -321,7 +323,8 @@ function addEvents(){
 
   
   $('#btn-confirm-revision').on('click', function(){
-    $('#txt-diff-version').prop('value', 10);
+    var version = $('#btn-confirm-revision').attr('value');
+    $('#txt-diff-version').prop('value', version);
     $('#revision-selector-modal').modal('hide');
     $('#txt-diff-version').focus();
   });
@@ -404,7 +407,7 @@ function process_list_dir(){
     diff_list = [];
     file_path = encodeURIComponent(file_path);
     $.ajax({
-      url: 'http://' + server_ip + ':' + file_server_port + '/file?path=' + file_path,
+      url: 'http://' + server_ip + ':' + file_server_port + '/file?path=' + file_path + '&checker=' + userid,
       jsonp: 'callback',
       dataType: 'jsonp',
       jsonpCallback: 'process_file_source'
@@ -511,7 +514,7 @@ function build_modal_file_tree(parent, childs){
 
 function load_svn_logs(filename, limit){
   $.ajax({
-    url: 'http://' + server_ip + ':' + file_server_port + '/log?file=' + filename + '&num=' + limit,
+    url: 'http://' + server_ip + ':' + file_server_port + '/log?file=' + filename + '&num=' + limit + '&checker=' + userid,
     jsonp: 'callback',
     dataType: 'jsonp',
     success: function(data){
@@ -529,7 +532,7 @@ function load_svn_logs(filename, limit){
         $('#tb-version-content tr').css('background-color', '');
         $(this).css('background-color', '#ddffdd');
         var version = $(this).children().first().text();
-        console.log(version);
+        $('#btn-confirm-revision').attr('value', version);
       });
     }
   });

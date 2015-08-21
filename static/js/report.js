@@ -1,3 +1,5 @@
+$('.table-user-jobs').DataTable();
+
 $('#merge-test').on('click', function(){
   var checked = $('input:checkbox:checked');
   var job_ids = checked.map(function(){

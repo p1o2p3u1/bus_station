@@ -29,7 +29,7 @@ def index():
     username = session.get('fullname')
     userid = session.get('email')
     admin = session.get('admin')
-    return render_template('index.html', name=username, admin=admin)
+    return render_template('index.html', name=username, userid=userid, admin=admin)
 
 
 @app.route("/login")

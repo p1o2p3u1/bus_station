@@ -3,6 +3,20 @@ SyntaxHighlighter.defaults['quick-code'] = false;
 SyntaxHighlighter.all();
 
 var display = false;
+$('#table-report-detail').DataTable({
+  'fnFooterCallback': function(foot, data, start, end, display){
+    var total_line = 0;
+    var total_exec = 0;
+    var total_miss = 0;
+    for(var i = start; i<end; i++){
+      total_line += parseInt(data[i][3]);
+      total_exec += parseInt(data[i][4]);
+      total_miss += parseInt(data[i][5]);
+    }
+    var html = "<tr><td>合计</td><td></td><td></td><td>" + total_line + "</td><td>" + total_exec + "</td><td>" + total_miss + "</td><td>" + (total_exec * 100 / total_line).toFixed(2) + "%</td></tr>"
+    $('.dataTable tfoot').html(html);
+  }
+});
 
 $('.view-source').click(function(e){
   e.preventDefault();
@@ -40,3 +54,4 @@ $('.view-source').click(function(e){
   }
 
 });
+

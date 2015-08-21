@@ -12,3 +12,22 @@
   border-collapse:collapse;
   width: 700px;
 }
+
+.table-user-jobs {
+  font:14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color:#777;
+  font-weight:300;
+  border-collapse:collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.table-user-jobs th,
+.table-user-jobs td {
+  text-align:left;
+  padding:5px 10px;
+  border-bottom:1px solid #e5e5e5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
