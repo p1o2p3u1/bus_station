@@ -193,7 +193,7 @@ function addEvents(){
       }
       // get diff info
       $.ajax({
-        url: "http://" + server_ip + ":" + file_server_port + "/diff?path=" + filename + '&old=' + old_version + '&cur=' + cur_version,
+        url: "http://" + server_ip + ":" + file_server_port + "/diff?path=" + filename + '&old=' + old_version + '&cur=' + cur_version + '&checker=' + userid,
         jsonp: 'callback',
         dataType: "jsonp",
         success: function(data){
