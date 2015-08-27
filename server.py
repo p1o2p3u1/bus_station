@@ -189,5 +189,11 @@ def check_merge():
         'success': True
     })
 
+@app.route('/call_stack.html')
+def call_stack():
+    if not session.get('email'):
+        return redirect(url_for('login'))
+    return render_template('call_stack.html')
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", threaded=True, port=8889, debug=True)
