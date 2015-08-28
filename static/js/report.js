@@ -1,4 +1,4 @@
-$('.table-user-jobs').DataTable();
+var opTable = $('.table-user-jobs').dataTable();
 
 $('#merge-test').on('click', function(){
   var checked = $('input:checkbox:checked');
@@ -49,9 +49,19 @@ $('#btn-confirm-test').on('click', function(){
         contentType: 'application/json',
         data: JSON.stringify(data),
         dataType: 'json',
-        success: function (e) {
-          console.log(e);
-          alert('success');
+        success: function (e) {  
+          var job = e['job'];
+          opTable.fnAddData([
+            '<input type="checkbox" class="chk-job-merge" id="' + job['id'] + '">',
+            job['id'],
+            '<a href="report_detail.html?id=' + job['id']+ '" target="_blank">' + job['jobname'] + '</a>',
+            job['username'],
+            new Date(job['time']).toLocaleString()
+          ]);
+          // sort by id to display the new row on top
+          opTable.fnSort([1, 'desc']);
+          // uncheck all the checkboxes.
+          $('input[type="checkbox"]').prop('checked', false);
         }
       });
       $('#test-confirm-dialog').modal('hide');

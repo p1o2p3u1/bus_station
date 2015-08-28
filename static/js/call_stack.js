@@ -1,9 +1,10 @@
 var isopen = false;
 var server_ip = "";
 var server_port = "";
+var opTable = null;
 function addEvent(){
   
-  // $('.table').DataTable();
+  opTable = $('#tb-call-graph').dataTable();
   
   $('#btn-connect').on('click', function(){
     var $btn = $(this).button('loading');
@@ -61,7 +62,12 @@ function addEvent(){
         build_table(obj);
       } else {
         var arr = new Uint8Array(e.data);
-        var image = btoa(String.fromCharCode.apply(null, arr));
+        var len = arr.byteLength;
+        var bin = '';
+        for(var i=0; i<len; i++){
+          bin += String.fromCharCode(arr[i]);
+        }
+        var image = btoa(bin);
         var html = '<img src="data:image/png;base64,' + image + '" />'
         $('#graph').html(html);
       }
@@ -97,16 +103,16 @@ function sendMessage(message){
 
 function build_table(data){
   nodes = data['nodes'];
-  /*
-  nodes = nodes.sort(function(a, b){
-    return b['avg'] - a['avg'] ;
-  }); */
-  var html = "";
+  opTable.fnClearTable();
+  // add new rows
+  var rows = [];
   for(var i=0; i<nodes.length; i++){
-    html += '<tr><td title="' + nodes[i]['name'] + '">' + nodes[i]['name'] + '</td>';
-    html += '<td>' + nodes[i]['calls'] + '</td>';
-    html += '<td>' + nodes[i]['time'] + '</td>';
-    html += '<td>' + nodes[i]['avg'] + '</td></tr>';
+    rows.push([
+      nodes[i]['name'],
+      nodes[i]['calls'],
+      nodes[i]['time'],
+      nodes[i]['avg'],
+    ]);
   }
-  $('#tb-call-detail').html(html);
+  opTable.fnAddData(rows);
 }

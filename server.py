@@ -22,6 +22,7 @@ app = Flask(__name__)
 app.secret_key = 'hi09jh123oi3tt0w^%@#*%^(GU)*UOVI&TD'
 admins = configs.admins
 
+
 @app.route("/")
 def index():
     if not session.get('email'):
@@ -106,6 +107,7 @@ def save_reports():
     host = request.json['host']
     port = request.json['port']
     path = request.json['path']
+    user = request.json['user']
     reports = []
     for filepath, cov in coverage.iteritems():
         filename = filepath.replace(path, '')
@@ -117,7 +119,8 @@ def save_reports():
             'cov_result': cov['coverage']
         }
         # get source text and revision
-        url = "http://" + host + ":" + port + "/file?path=" + quote(filename, safe='')
+        url = "http://" + host + ":" + port + "/file?path=" + quote(filename, safe='')\
+              + "&checker=" + quote(user, safe='')
         res = requests.get(url)
         text = json.loads(res.text)
         report['source'] = text['text']
@@ -174,6 +177,7 @@ def merge_jobs():
         "job": result
     })
 
+
 @app.route('/check_merge')
 @request_db_connect
 def check_merge():
@@ -189,11 +193,13 @@ def check_merge():
         'success': True
     })
 
+
 @app.route('/call_stack.html')
 def call_stack():
     if not session.get('email'):
         return redirect(url_for('login'))
     return render_template('call_stack.html')
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", threaded=True, port=8889, debug=True)

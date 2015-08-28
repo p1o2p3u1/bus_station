@@ -153,7 +153,8 @@ def merge_jobs(user_id, job_name, job_list):
         username |= set(names)
     username = ','.join(x for x in username)
     job_id = save_reports(username, user_id, job_name, reports, auto_commit=True)
-    return job_id
+    job = query_job_by_job_id(job_id)
+    return job
 
 
 def query_merge_result(merge_list):
@@ -196,3 +197,13 @@ def query_merge_result(merge_list):
             t['cov_result'] = float(len(t['exec'])) / len(t['line'])
         result.append(t)
     return result
+
+
+def query_job_by_job_id(job_id):
+    sql = "select id, userid, username, time, jobname from job where id=%s"
+    data = (job_id, )
+    g.cursor.execute(sql, data)
+    rows = g.cursor.fetchall()
+    if len(rows) == 0:
+        return None
+    return rows[0]

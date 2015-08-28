@@ -275,7 +275,8 @@ function addEvents(){
         'coverage': coverage_data,
         'host': server_ip,
         'port': file_server_port,
-        'path': path
+        'path': path,
+        'user': userid
       };
       $.ajax({
         url: '/report',
