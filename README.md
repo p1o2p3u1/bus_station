@@ -4,7 +4,7 @@ Bus station for all the regular buses. Display the python coverage result in rea
 
 ## Snapshot
 ![](http://git.163-inc.com/ting.wu/bus_station/raw/master/docs/result.png)
-
+![](http://git.163-inc.com/ting.wu/bus_station/raw/master/docs/call_graph.png)
 ## Setup
 
 1. Choose a project to test.
