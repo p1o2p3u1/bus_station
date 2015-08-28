@@ -179,15 +179,15 @@ function addEvents(){
   
   $('#chk-show-diff').on('click', function(){
     show_diff = $(this).is(':checked');
-    // remove the original coverage info
-    $('#source .line').removeClass('mis').removeClass('run');
     var filename = $('#source').attr('value');
     if(!filename || filename == "") return;
     if(show_diff){
+      // remove the original coverage info
+      $('#source .line').removeClass('mis').removeClass('run');
       filename = encodeURIComponent(filename);
       var cur_version = $("#source-revision").text();
       var old_version = $("#txt-diff-version").val();
-      if(!old_version || old_version > cur_version){
+      if(old_version == "" || parseInt(old_version) > parseInt(cur_version)){
         alert("diff版本要小于当前文件版本");
         return;
       }
