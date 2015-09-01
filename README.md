@@ -3,7 +3,7 @@
 Bus station for all the regular buses. Display the python coverage result in real time.
 
 ## Snapshot
-![](http://git.163-inc.com/ting.wu/bus_station/raw/master/docs/result.png)
+![](https://raw.githubusercontent.com/p1o2p3u1/bus_station/master/docs/result.png)
 
 如果要使用函数调用图的绘图功能，需要在游戏服务器上安装绘图工具，安装方式为
 
@@ -11,7 +11,7 @@ Bus station for all the regular buses. Display the python coverage result in rea
 sudo apt-get install graphviz libgraphviz-dev pkg-config
 ```
 
-![](http://git.163-inc.com/ting.wu/bus_station/raw/master/docs/call_graph.png)
+![](https://raw.githubusercontent.com/p1o2p3u1/bus_station/master/docs/call_graph.png)
 
 ## Setup
 
