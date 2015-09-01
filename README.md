@@ -20,6 +20,5 @@ sudo apt-get install graphviz libgraphviz-dev pkg-config
 3. open and edit `app.config` to connect to your own database. You can find the sql script in gas_station project.
 4. `python server.py` and enjoy.
 
-## More info
-
-Please visit wiki: http://git.163-inc.com/ting.wu/bus_station/wikis/home
+## Reference
+[pycallgraph]https://github.com/gak/pycallgraph
